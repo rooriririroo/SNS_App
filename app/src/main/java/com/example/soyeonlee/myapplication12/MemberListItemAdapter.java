@@ -1,6 +1,9 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +72,6 @@ public class MemberListItemAdapter extends BaseAdapter {
         else {
             viewHolder = (MemberListItemAdapter.ViewHolder) convertView.getTag();
         }
-
         Glide.with(context).load(listItemArrayList.get(position).getUserImage()).error(R.drawable.ir).into(viewHolder.userImage);
         viewHolder.userImage.setOnClickListener(new View.OnClickListener() {
             @Override

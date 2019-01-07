@@ -6,12 +6,23 @@ public class MemberListItem {
     private String userName;
     private String userNickname;
     private String userPhone;
+    private String userDate;
+    private String userBirth;
 
     public MemberListItem(String userImage, String userName, String userNickname, String userPhone) {
         this.userImage = userImage;
         this.userName = userName;
         this.userNickname = userNickname;
         this.userPhone = userPhone;
+    }
+
+    public MemberListItem(String userDate, String userImage, String userName, String userNickname, String userBirth, String userPhone) {
+        this.userDate = userDate;
+        this.userImage = userImage;
+        this.userName = userName;
+        this.userNickname = userNickname;
+        this.userPhone = userPhone;
+        this.userBirth = userBirth;
     }
 
     public String getUserImage() {
@@ -44,5 +55,21 @@ public class MemberListItem {
 
     public void setUserPhone(String userPhone) {
         this.userPhone = userPhone;
+    }
+
+    public String getUserDate() {
+        return userDate;
+    }
+
+    public void setUserDate(String userDate) {
+        this.userDate = userDate;
+    }
+
+    public String getUserBirth() {
+        return userBirth;
+    }
+
+    public void setUserBirth(String userBirth) {
+        this.userBirth = userBirth;
     }
 }

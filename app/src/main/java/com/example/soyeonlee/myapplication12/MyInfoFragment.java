@@ -1,9 +1,12 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -139,7 +142,10 @@ public class MyInfoFragment extends Fragment {
                         if(object.get("userID").getAsString().equals(userID)) {
                             String userImage = object.get("userImage").getAsString();
                             //myinfo_image.setImageURI(Uri.parse(userImage));
-                            Glide.with(getContext()).load(userImage).into(myinfo_image);
+                            //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(),Uri.parse(userImage));
+                            //myinfo_image.setImageBitmap(bitmap);
+                            //Glide.with(getContext()).load(bitmap).into(myinfo_image);
+                            Glide.with(getContext()).load(Uri.parse(userImage)).into(myinfo_image);
                             String userName = object.get("userName").getAsString();
                             myinfo_name.setText(userName);
                             String userBirth = object.get("userBirth").getAsString();

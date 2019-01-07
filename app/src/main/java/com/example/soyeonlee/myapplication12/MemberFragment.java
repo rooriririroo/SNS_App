@@ -1,5 +1,6 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -31,11 +33,20 @@ public class MemberFragment extends Fragment {
     ListView member_list;
     MemberListItemAdapter adapter;
     ArrayList<MemberListItem> memberListItemArrayList;
+    TextView member_invite;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_member,container,false);
+
+        member_invite = rootView.findViewById(R.id.member_invite);
+        member_invite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(),"멤버 초대하기",Toast.LENGTH_SHORT).show();
+            }
+        });
 
         memberListItemArrayList = new ArrayList<MemberListItem>();
         member_list = (ListView) rootView.findViewById(R.id.member_list);
@@ -43,6 +54,12 @@ public class MemberFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(),MemberDetailActivity.class);
+                intent.putExtra("userDate",memberListItemArrayList.get(position).getUserDate());
+                intent.putExtra("userImage",memberListItemArrayList.get(position).getUserImage());
+                intent.putExtra("userName",memberListItemArrayList.get(position).getUserName());
+                intent.putExtra("userNickname",memberListItemArrayList.get(position).getUserNickname());
+                intent.putExtra("userBirth",memberListItemArrayList.get(position).getUserBirth());
+                intent.putExtra("userPhone",memberListItemArrayList.get(position).getUserPhone());
                 startActivity(intent);
             }
         });
@@ -65,8 +82,20 @@ public class MemberFragment extends Fragment {
                         String userPhone = object.get("userPhone").getAsString();
                         String userNickname = object.get("userNickname").getAsString();
                         String userImage = object.get("userImage").getAsString();
+                        String userDate = object.get("userDate").getAsString();
+                        String userBirth = object.get("userBirth").getAsString();
 
-                        memberListItemArrayList.add(new MemberListItem(userImage,userName,userNickname,userPhone));
+                        //memberListItemArrayList.add(new MemberListItem(userImage,userName,userNickname,userPhone));
+                        memberListItemArrayList.add(new MemberListItem(userDate,userImage,userName,userNickname,userBirth,userPhone));
+                        //onMemberDataListener.onMemberDataSet(userDate,userImage,userName,userNickname,userBirth,userPhone);
+                        /*
+                        Intent intent = new Intent(getContext(),MemberDetailActivity.class);
+                        intent.putExtra("userName",userName);
+                        intent.putExtra("userPhone",userPhone);
+                        intent.putExtra("userNickname",userNickname);
+                        intent.putExtra("userImage",userImage);
+                        intent.putExtra("userDate",userDate);
+                        startActivity(intent);*/
                     }
                     adapter.notifyDataSetChanged();
                 }

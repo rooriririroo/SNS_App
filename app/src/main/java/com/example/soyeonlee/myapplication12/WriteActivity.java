@@ -169,10 +169,11 @@ public class WriteActivity extends AppCompatActivity {
                     imageView.setAdjustViewBounds(true);
                     imageView.setImageURI(uri_image);
                     linearLayout.addView(imageView);
+                    //Toast.makeText(getApplicationContext(),uri_image.toString(),Toast.LENGTH_SHORT).show();
 
                     final EditText textForImage = new EditText(getApplicationContext());
                     textForImage.setPadding(30,0,30,0);
-                    textForImage.setText("");
+                    textForImage.setText(getRealPath(uri_image));
                     textForImage.setCursorVisible(false);
                     textForImage.setBackgroundColor(Color.TRANSPARENT);
 
@@ -202,6 +203,7 @@ public class WriteActivity extends AppCompatActivity {
 
                     Glide.with(getApplicationContext()).load(uri_video).override(1000,800).into(video);
                     linearLayout.addView(video);
+                    //Toast.makeText(getApplicationContext(),uri_video.toString(),Toast.LENGTH_SHORT).show();
                     final EditText textForVideo = new EditText(getApplicationContext());
                     textForVideo.setPadding(30,0,30,0);
                     textForVideo.setText("");
@@ -305,5 +307,15 @@ public class WriteActivity extends AppCompatActivity {
                 result = uri.getLastPathSegment();
         }
         return result;
+    }
+
+    private String getRealPath(Uri cUri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(cUri,projection,null,null,null);
+        cursor.moveToNext();
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
+        Uri uri = Uri.fromFile(new File(path));
+        cursor.close();
+        return path;
     }
 }
