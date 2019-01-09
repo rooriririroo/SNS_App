@@ -7,11 +7,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
@@ -46,6 +48,11 @@ public class GridActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String path = intent.getStringExtra("folderPath");
         String name = intent.getStringExtra("folderName");
+
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.custom_actionbar_back);
+        getSupportActionBar().setTitle(name);
+
         File filePath = new File(path);
         File[] files = filePath.listFiles();
         Arrays.sort(files, new Comparator<File>() {
@@ -65,6 +72,10 @@ public class GridActivity extends AppCompatActivity {
                 count++;
             }
         }
+
+        //Intent numIntent = new Intent(GridActivity.this,GalleryDetailActivity.class);
+        //numIntent.putExtra("fileTotal",String.valueOf(count));
+        //startActivity(numIntent);
         //Toast.makeText(getApplicationContext(),intent.getStringExtra("folderPath"),Toast.LENGTH_SHORT).show();
 
 

@@ -55,7 +55,8 @@
 
         <activity android:name=".MapsActivity" />
         <activity android:name=".GalleryActivity" />
-        <activity android:name=".GridActivity"></activity>
+        <activity android:name=".GridActivity" />
+        <activity android:name=".GalleryDetailActivity"></activity>
     </application>
 
 </manifest>

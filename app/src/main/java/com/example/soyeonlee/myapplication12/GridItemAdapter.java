@@ -1,6 +1,7 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class GridItemAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         if(convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_griditem,null);
@@ -64,14 +65,14 @@ public class GridItemAdapter extends BaseAdapter {
         }
 
         viewHolder.gridImage.setId(position);
-        //viewHolder.gridImage.setImageURI(Uri.parse(gridItemArrayList.get(position).getGridImage()));
-        //requestManager.load(gridItemArrayList.get(position).getGridImage()).asBitmap().into(viewHolder.gridImage);
         Glide.with(context).load(gridItemArrayList.get(position).getGridImage()).into(viewHolder.gridImage);
         viewHolder.gridImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                int id= v.getId();
+                Intent intent = new Intent(context,GalleryDetailActivity.class);
+                intent.putExtra("filePath",gridItemArrayList.get(id).getGridImage());
+                context.startActivity(intent);
             }
         });
 
@@ -87,10 +88,4 @@ public class GridItemAdapter extends BaseAdapter {
 
         return convertView;
     }
-    private SimpleTarget target = new SimpleTarget<Bitmap>(250,250) {
-        @Override
-        public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-
-        }
-    };
 }
