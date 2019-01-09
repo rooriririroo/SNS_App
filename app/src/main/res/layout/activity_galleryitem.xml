@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/gallery_image"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ir"/>
+
+    <TextView
+        android:id="@+id/gallery_title"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="30dp"
+        android:text="모든 사진"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/gallery_num"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="90dp"
+        android:drawableEnd="@drawable/outline_navigate_next_black_18dp"
+        android:drawableTint="#c2c2c2"
+        android:text="108"
+        android:textColor="#c2c2c2"/>
+
+
+</LinearLayout>

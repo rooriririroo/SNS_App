@@ -1,7 +1,10 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.Manifest;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -13,8 +16,12 @@ import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Parcelable;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,8 +41,11 @@ import android.widget.VideoView;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 public class WriteActivity extends AppCompatActivity {
 
@@ -81,10 +91,20 @@ public class WriteActivity extends AppCompatActivity {
         image_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent,1);
+                int permissionCheck = ContextCompat.checkSelfPermission(WriteActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                if(permissionCheck == PackageManager.PERMISSION_DENIED) {
+                    ActivityCompat.requestPermissions(WriteActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
+                }
+                else {
+                Intent intent = new Intent(WriteActivity.this,GalleryActivity.class);
+                startActivity(intent);
+                }
+                /*
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                startActivityForResult(Intent.createChooser(intent,"이미지 불러오기"),1);*/
+                //startActivityForResult(intent,1);
             }
         });
 
@@ -92,10 +112,15 @@ public class WriteActivity extends AppCompatActivity {
         video_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setDataAndType(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,"video/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                startActivityForResult(Intent.createChooser(intent,"영상 불러오기"),2);
+                /*
                 Intent intent = new Intent();
                 intent.setType("video/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent,2);
+                startActivityForResult(intent,2);*/
             }
         });
 
@@ -164,16 +189,67 @@ public class WriteActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK) {
                 try {
                     uri_image = data.getData();
+
+                    /*ArrayList imageList = new ArrayList<>();
+
+                    ImageView image = new ImageView(getApplicationContext());
+                    if(data.getClipData() == null) {
+                        imageList.add(String.valueOf(data.getData()));
+                    }
+                    else {
+                        ClipData clipData = data.getClipData();
+                        if(clipData.getItemCount() > 10) {
+                            Toast.makeText(WriteActivity.this,"한 번에 10개까지 선택 가능",Toast.LENGTH_SHORT).show();
+                        }
+                        else if(clipData.getItemCount() == 1) {
+                            String dataStr = String.valueOf(clipData.getItemAt(0).getUri());
+                            imageList.add(dataStr);
+                            image.setImageURI(Uri.parse(dataStr));
+                            linearLayout.addView(image);
+                        }
+                        else if(clipData.getItemCount() > 1 && clipData.getItemCount() < 10) {
+                            for(int i=0; i<clipData.getItemCount(); i++) {
+                                String dataStr = String.valueOf(clipData.getItemAt(i).getUri());
+                                imageList.add(dataStr);
+                                image.setImageURI(Uri.parse(dataStr));
+                                linearLayout.addView(image);
+                            }
+                        }
+                    }*/
+
+                    /*InputStream in = getContentResolver().openInputStream(uri_image);
+                    Bitmap img = BitmapFactory.decodeStream(in);
+                    in.close();*/
+
+                    /*
+                    String wholeID = DocumentsContract.getDocumentId(uri_image);
+                    String id = wholeID.split(":")[1];
+                    String[] column = {MediaStore.Images.Media.DATA};
+                    String sel = MediaStore.Images.Media._ID + "=?";
+                    Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            column,sel,new String[]{id},null);
+                    String filePath = "";
+                    int columnIndex = cursor.getColumnIndex(column[0]);
+                    if(cursor.moveToFirst()) {
+                        filePath = cursor.getString(columnIndex);
+                    }
+                    cursor.close();*/
+
+                    /*
                     ImageView imageView = new ImageView(getApplicationContext());
                     imageView.setPadding(30,0,30,0);
                     imageView.setAdjustViewBounds(true);
                     imageView.setImageURI(uri_image);
-                    linearLayout.addView(imageView);
+                    //imageView.setImageBitmap(img);
+                    linearLayout.addView(imageView);*/
+
+
+
                     //Toast.makeText(getApplicationContext(),uri_image.toString(),Toast.LENGTH_SHORT).show();
 
                     final EditText textForImage = new EditText(getApplicationContext());
                     textForImage.setPadding(30,0,30,0);
-                    textForImage.setText(getRealPath(uri_image));
+                    textForImage.setText(uri_image.toString());
                     textForImage.setCursorVisible(false);
                     textForImage.setBackgroundColor(Color.TRANSPARENT);
 
@@ -307,6 +383,19 @@ public class WriteActivity extends AppCompatActivity {
                 result = uri.getLastPathSegment();
         }
         return result;
+    }
+
+    private String getRealPath2(Uri cUri) {
+        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(cUri,filePathColumn, null, null, null);
+        cursor.moveToFirst();
+        int columnindex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+        String file_path = cursor.getString(columnindex);
+        Uri fileUri = Uri.parse("file://" + file_path);
+        cursor.close();
+
+        return fileUri.toString();
+        //launchUploadActivity(true, PICK_IMAGE);
     }
 
     private String getRealPath(Uri cUri) {

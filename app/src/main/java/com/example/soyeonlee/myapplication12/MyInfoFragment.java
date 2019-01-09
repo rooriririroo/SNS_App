@@ -62,6 +62,10 @@ public class MyInfoFragment extends Fragment {
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_myinfo,container,false);
 
         myinfo_image = rootView.findViewById(R.id.myinfo_image);
+        //myinfo_image.setImageURI(Uri.parse("/storage/emulated/0/Foodie/2019-01-02-14-03-23.jpg"));
+        //myinfo_image.setImageResource(R.drawable.back);
+        //myinfo_image.setImageURI(Uri.parse("content://media/external/images/media/19243"));
+        //Glide.with(getContext()).load(Uri.parse("content://media/external/images/media/19243")).into(myinfo_image);
         myinfo_name = rootView.findViewById(R.id.myinfo_name);
         myinfo_nickname = rootView.findViewById(R.id.myinfo_nickname);
         myinfo_birth = rootView.findViewById(R.id.myinfo_birth);
@@ -73,7 +77,7 @@ public class MyInfoFragment extends Fragment {
         Bundle bundle = getArguments();
         if(bundle != null) {
             userID = bundle.getString("userID");
-            myinfo_nickname.setText(userID);
+            //myinfo_nickname.setText(userID);
         }
 
         /*
@@ -140,14 +144,22 @@ public class MyInfoFragment extends Fragment {
                         JsonObject object = (JsonObject) array.get(i);
 
                         if(object.get("userID").getAsString().equals(userID)) {
-                            String userImage = object.get("userImage").getAsString();
-                            //myinfo_image.setImageURI(Uri.parse(userImage));
+                            String userImage = object.get("userImage").getAsString().trim();
+                            InputStream in = getActivity().getContentResolver().openInputStream(Uri.parse(userImage));
+                            Bitmap img = BitmapFactory.decodeStream(in);
+                            in.close();
+                            myinfo_image.setImageBitmap(img);
+                            //myinfo_image.setImageURI(Uri.parse("file:///storage/emulated/0/Foodie/2019-01-02-14-03-23.jpg"));
                             //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(),Uri.parse(userImage));
                             //myinfo_image.setImageBitmap(bitmap);
+                            //Glide.with(getContext()).load("file:///storage/emulated/0/Foodie/2019-01-02-14-03-23.jpg").into(myinfo_image);
                             //Glide.with(getContext()).load(bitmap).into(myinfo_image);
-                            Glide.with(getContext()).load(Uri.parse(userImage)).into(myinfo_image);
+                            //Glide.with(getContext()).load(Uri.parse(userImage)).into(myinfo_image);
+
                             String userName = object.get("userName").getAsString();
-                            myinfo_name.setText(userName);
+                            myinfo_name.setText(userImage);
+                            String userNickname = object.get("userNickname").getAsString();
+                            myinfo_nickname.setText(userNickname);
                             String userBirth = object.get("userBirth").getAsString();
                             myinfo_birth.setText(userBirth);
                             String userPhone = object.get("userPhone").getAsString();

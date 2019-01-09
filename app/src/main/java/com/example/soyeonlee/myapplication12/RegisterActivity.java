@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Calendar;
@@ -98,7 +100,8 @@ public class RegisterActivity extends AppCompatActivity {
         String userBirth = register_birth1.getText().toString() + "년" + register_birth2.getText().toString() + "월"
                 + register_birth3.getText().toString() + "일";
         String userNickname = register_nickname.getText().toString();
-        String userImage = uri.toString();
+        //String userImage = uri.toString();
+        String userImage = getRealPath(uri);
         String userDate = String.format("%d년 %02d월 %02d일",year,month+1,day);
 
         if(!validate) {
@@ -223,5 +226,15 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private String getRealPath(Uri cUri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(cUri,projection,null,null,null);
+        cursor.moveToNext();
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
+        Uri uri = Uri.fromFile(new File(path));
+        cursor.close();
+        return path;
     }
 }
