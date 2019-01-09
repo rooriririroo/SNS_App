@@ -27,6 +27,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -73,8 +76,10 @@ public class WriteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
+        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        //getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("글쓰기");
 
         linearLayout = (LinearLayout) findViewById(R.id.dynamic_layout);
 
@@ -96,15 +101,9 @@ public class WriteActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(WriteActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
                 }
                 else {
-                Intent intent = new Intent(WriteActivity.this,GalleryActivity.class);
-                startActivity(intent);
+                    Intent intent = new Intent(WriteActivity.this,GalleryActivity.class);
+                    startActivity(intent);
                 }
-                /*
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
-                startActivityForResult(Intent.createChooser(intent,"이미지 불러오기"),1);*/
-                //startActivityForResult(intent,1);
             }
         });
 
@@ -112,15 +111,14 @@ public class WriteActivity extends AppCompatActivity {
         video_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setDataAndType(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,"video/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
-                startActivityForResult(Intent.createChooser(intent,"영상 불러오기"),2);
-                /*
-                Intent intent = new Intent();
-                intent.setType("video/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent,2);*/
+                int permissionCheck = ContextCompat.checkSelfPermission(WriteActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                if(permissionCheck == PackageManager.PERMISSION_DENIED) {
+                    ActivityCompat.requestPermissions(WriteActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
+                }
+                else {
+                    Intent intent = new Intent(WriteActivity.this,VideoGalleryActivity.class);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -155,28 +153,6 @@ public class WriteActivity extends AppCompatActivity {
 
         helper = new ListDBHelper(this);
 
-    }
-
-    public void backClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("");
-        builder.setMessage("지금 나가면 글이 저장되지 않습니다.\n나가시겠습니까?");
-
-        // 글 저장 안하고 나가기
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-
-        // 기존 글쓰기 창으로 돌아가기
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.show();
     }
 
     public void saveClick(View v) {
@@ -406,5 +382,42 @@ public class WriteActivity extends AppCompatActivity {
         Uri uri = Uri.fromFile(new File(path));
         cursor.close();
         return path;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_save,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch(menuItem.getItemId()) {
+            case android.R.id.home :
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("");
+                builder.setMessage("지금 나가면 글이 저장되지 않습니다.\n나가시겠습니까?");
+
+                // 글 저장 안하고 나가기
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+
+                // 기존 글쓰기 창으로 돌아가기
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                builder.show();
+                return true;
+            case R.id.menu_save_button :
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 }

@@ -5,6 +5,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -26,8 +29,8 @@ public class VoteActivity extends AppCompatActivity {
 
         linearLayout = (LinearLayout) findViewById(R.id.dynamic_vote);
 
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("투표");
 
         vote_switch_plural = findViewById(R.id.vote_switch_plural);
         vote_switch_plural.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -90,5 +93,25 @@ public class VoteActivity extends AppCompatActivity {
 
     public void saveClick(View v) {
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //inflater.inflate(R.menu.menu_attach, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_save,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch(menuItem.getItemId()) {
+            case android.R.id.home :
+                finish();
+                return true;
+            case R.id.menu_save_button :
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 }

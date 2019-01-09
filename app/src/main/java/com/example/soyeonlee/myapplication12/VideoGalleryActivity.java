@@ -1,12 +1,7 @@
 package com.example.soyeonlee.myapplication12;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,21 +10,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
 
-public class GalleryActivity extends AppCompatActivity {
+public class VideoGalleryActivity extends AppCompatActivity {
 
     ArrayList<GalleryListItem> galleryListItemArrayList;
     GalleryListItemAdapter adapter;
@@ -40,13 +29,14 @@ public class GalleryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.activity_video_gallery);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("사진");
+        getSupportActionBar().setTitle("영상");
+
 
         galleryListItemArrayList = new ArrayList<GalleryListItem>();
-        listView = findViewById(R.id.gallery_list);
+        listView = findViewById(R.id.video_list);
         adapter = new GalleryListItemAdapter(this,galleryListItemArrayList);
         listView.setAdapter(adapter);
 
@@ -68,7 +58,7 @@ public class GalleryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String intentPath = galleryListItemArrayList.get(position).getGalleryTitle();
-                Intent intent = new Intent(GalleryActivity.this,GridActivity.class);
+                Intent intent = new Intent(VideoGalleryActivity.this,VideoGridActivity.class);
                 intent.putExtra("folderPath",galleryListItemArrayList.get(position).getGalleryPath());
                 intent.putExtra("folderName",galleryListItemArrayList.get(position).getGalleryTitle());
                 startActivity(intent);
@@ -99,7 +89,7 @@ public class GalleryActivity extends AppCompatActivity {
                     galleryList(file.getAbsoluteFile());
             }
             else if(file.isFile()) {
-                if(file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
+                if(file.getName().endsWith(".mp4")) {
                     File parentDirectory = new File(file.getParent());
                     galleryListItemArrayList.add(new GalleryListItem(file.getAbsolutePath(),parentDirectory.getName(),String.valueOf(files.length),file.getParent()));
                     break;

@@ -1,13 +1,8 @@
 package com.example.soyeonlee.myapplication12;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,27 +11,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class GridActivity extends AppCompatActivity {
+public class VideoGridActivity extends AppCompatActivity {
 
     GridView gridView;
     ArrayList<GridItem> gridItemArrayList;
-    GridItemAdapter adapter;
+    VideoGridItemAdapter adapter;
     int count = 0;
     boolean[] selection;
 
@@ -47,7 +39,7 @@ public class GridActivity extends AppCompatActivity {
 
         gridView = findViewById(R.id.grid);
         gridItemArrayList = new ArrayList<GridItem>();
-        adapter = new GridItemAdapter(this,gridItemArrayList);
+        adapter = new VideoGridItemAdapter(this,gridItemArrayList);
         gridView.setAdapter(adapter);
 
         Intent intent = getIntent();
@@ -56,8 +48,6 @@ public class GridActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(name);
-        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        //getSupportActionBar().setCustomView(R.layout.custom_actionbar_grid);
 
         File filePath = new File(path);
         File[] files = filePath.listFiles();
@@ -73,23 +63,17 @@ public class GridActivity extends AppCompatActivity {
         });
 
         for(File file : files) {
-            if(file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
+            if(file.getName().endsWith(".mp4")) {
                 gridItemArrayList.add(new GridItem(file.getAbsolutePath()));
                 count++;
             }
         }
 
         selection = new boolean[count];
-
-        //Intent numIntent = new Intent(GridActivity.this,GalleryDetailActivity.class);
-        //numIntent.putExtra("fileTotal",String.valueOf(count));
-        //startActivity(numIntent);
-        //Toast.makeText(getApplicationContext(),intent.getStringExtra("folderPath"),Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //inflater.inflate(R.menu.menu_attach, menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_attach,menu);
         return true;
@@ -108,7 +92,7 @@ public class GridActivity extends AppCompatActivity {
     }
 
     // 어댑터
-    public class GridItemAdapter extends BaseAdapter {
+    public class VideoGridItemAdapter extends BaseAdapter {
 
         Context context;
         ArrayList<GridItem> gridItemArrayList = new ArrayList<GridItem>();
@@ -120,7 +104,7 @@ public class GridActivity extends AppCompatActivity {
             int id;
         }
 
-        public GridItemAdapter(Context context, ArrayList<GridItem> gridItemArrayList) {
+        public VideoGridItemAdapter(Context context, ArrayList<GridItem> gridItemArrayList) {
             this.context = context;
             this.gridItemArrayList = gridItemArrayList;
         }
@@ -159,9 +143,11 @@ public class GridActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     int id= v.getId();
-                    Intent intent = new Intent(context,GalleryDetailActivity.class);
-                    intent.putExtra("filePath",gridItemArrayList.get(id).getGridImage());
-                    context.startActivity(intent);
+                    Uri videoUri = Uri.parse(gridItemArrayList.get(id).getGridImage());
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(videoUri,"video/*");
+                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
                 }
             });
 

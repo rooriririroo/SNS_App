@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        //getSupportActionBar().setCustomView(R.layout.custom_actionbar_home);
-
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tl_tabs);
         Fragment[] arrFragments = new Fragment[4];
         arrFragments[0] = new HomeFragment();
@@ -56,15 +53,5 @@ public class MainActivity extends AppCompatActivity {
     public void addClick(View v) {
         Intent intent = new Intent(this,WriteActivity.class);
         startActivity(intent);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (System.currentTimeMillis() - time >= 2000) {
-            time = System.currentTimeMillis();
-            Toast.makeText(getApplicationContext(), "뒤로 버튼을 한번 더 누르면 종료합니다.", Toast.LENGTH_SHORT).show();
-        } else if (System.currentTimeMillis() - time < 2000) {
-            finish();
-        }
     }
 }
