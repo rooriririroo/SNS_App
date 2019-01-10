@@ -39,6 +39,9 @@ public class GridActivity extends AppCompatActivity {
     GridItemAdapter adapter;
     int count = 0;
     boolean[] selection;
+    int total = 0;
+    int badgeCount = 0;
+    ArrayList<String> arrPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class GridActivity extends AppCompatActivity {
         gridItemArrayList = new ArrayList<GridItem>();
         adapter = new GridItemAdapter(this,gridItemArrayList);
         gridView.setAdapter(adapter);
+        arrPath = new ArrayList<String>();
 
         Intent intent = getIntent();
         String path = intent.getStringExtra("folderPath");
@@ -80,10 +84,6 @@ public class GridActivity extends AppCompatActivity {
         }
 
         selection = new boolean[count];
-
-        //Intent numIntent = new Intent(GridActivity.this,GalleryDetailActivity.class);
-        //numIntent.putExtra("fileTotal",String.valueOf(count));
-        //startActivity(numIntent);
         //Toast.makeText(getApplicationContext(),intent.getStringExtra("folderPath"),Toast.LENGTH_SHORT).show();
     }
 
@@ -102,6 +102,19 @@ public class GridActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_attach_button :
+                //Toast.makeText(getApplicationContext(),String.valueOf(total),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),arrPath.toString(),Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(GridActivity.this,WriteActivity.class);
+                //intent.putExtra("hello","hello");
+                if(total == 1) {
+                    intent.putExtra("file",arrPath.get(0));
+                    startActivity(intent);
+                }
+                else if(total>1) {
+                    intent.putExtra("files",arrPath);
+                    setResult(RESULT_OK);
+                    startActivity(intent);
+                }
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
@@ -161,6 +174,8 @@ public class GridActivity extends AppCompatActivity {
                     int id= v.getId();
                     Intent intent = new Intent(context,GalleryDetailActivity.class);
                     intent.putExtra("filePath",gridItemArrayList.get(id).getGridImage());
+                    intent.putExtra("fileNum",String.valueOf(id+1));
+                    intent.putExtra("fileTotal",String.valueOf(count));
                     context.startActivity(intent);
                 }
             });
@@ -174,11 +189,15 @@ public class GridActivity extends AppCompatActivity {
                     if(selection[id]) {
                         cb.setChecked(false);
                         selection[id] = false;
+                        total--;
+                        arrPath.remove(gridItemArrayList.get(id).getGridImage());
                     }
                     else {
-                        Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
                         cb.setChecked(true);
                         selection[id] = true;
+                        total++;
+                        arrPath.add(gridItemArrayList.get(id).getGridImage());
                     }
                 }
             });

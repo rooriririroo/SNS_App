@@ -2,6 +2,7 @@ package com.example.soyeonlee.myapplication12;
 
 import android.content.Intent;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -112,6 +113,8 @@ public class VideoGalleryActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_camera_button :
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                startActivity(Intent.createChooser(intent,"사용할 애플리케이션 : "));
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);

@@ -4,20 +4,27 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/grid_image"
+        android:id="@+id/grid_video"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:src="@drawable/ir"/>
 
-
     <CheckBox
-        android:id="@+id/grid_check"
+        android:id="@+id/grid_video_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:button="@drawable/checkbox"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"/>
+
+    <TextView
+        android:id="@+id/grid_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="40dp"
+        android:drawableStart="@drawable/outline_play_circle_outline_opacity30_18dp"/>
 
 </RelativeLayout>

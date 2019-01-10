@@ -72,6 +72,9 @@ public class GalleryActivity extends AppCompatActivity {
                 intent.putExtra("folderPath",galleryListItemArrayList.get(position).getGalleryPath());
                 intent.putExtra("folderName",galleryListItemArrayList.get(position).getGalleryTitle());
                 startActivity(intent);
+
+                Intent writeIntent = new Intent(GalleryActivity.this,WriteActivity.class);
+                setResult(RESULT_OK,writeIntent);
             }
         });
     }
@@ -122,6 +125,8 @@ public class GalleryActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_camera_button :
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivity(Intent.createChooser(intent,"사용할 애플리케이션 : "));
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);

@@ -27,12 +27,14 @@ public class GalleryDetailActivity extends AppCompatActivity {
         else if(Build.VERSION.SDK_INT < 21)
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        Intent pathIntent = getIntent();
+        Intent intent = getIntent();
         gallerydetail_image = findViewById(R.id.gallerydetail_image);
         gallerydetail_num = findViewById(R.id.gallerydetail_num);
         gallerydetail_total = findViewById(R.id.gallerydetail_total);
 
-        Glide.with(getApplicationContext()).load(pathIntent.getStringExtra("filePath")).into(gallerydetail_image);
+        Glide.with(getApplicationContext()).load(intent.getStringExtra("filePath")).into(gallerydetail_image);
+        gallerydetail_num.setText(intent.getStringExtra("fileNum"));
+        gallerydetail_total.setText(intent.getStringExtra("fileTotal"));
 
         //Intent totalIntent = getIntent();
         //gallerydetail_total.setText(totalIntent.getStringExtra("fileTotal"));

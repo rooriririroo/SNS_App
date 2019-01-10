@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -31,6 +32,7 @@ public class VideoGridActivity extends AppCompatActivity {
     VideoGridItemAdapter adapter;
     int count = 0;
     boolean[] selection;
+    int total = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,7 @@ public class VideoGridActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_attach_button :
+                Toast.makeText(getApplicationContext(),String.valueOf(total),Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
@@ -128,10 +131,10 @@ public class VideoGridActivity extends AppCompatActivity {
         public View getView(final int position, View convertView, ViewGroup parent) {
 
             if(convertView == null) {
-                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_griditem,null);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_video_grid_item,null);
                 viewHolder = new ViewHolder();
-                viewHolder.gridImage = convertView.findViewById(R.id.grid_image);
-                viewHolder.gridCheck = convertView.findViewById(R.id.grid_check);
+                viewHolder.gridImage = convertView.findViewById(R.id.grid_video);
+                viewHolder.gridCheck = convertView.findViewById(R.id.grid_video_check);
                 convertView.setTag(viewHolder);
             }
             else {
@@ -147,7 +150,7 @@ public class VideoGridActivity extends AppCompatActivity {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setDataAndType(videoUri,"video/*");
                     startActivity(intent);
-                    Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -160,11 +163,13 @@ public class VideoGridActivity extends AppCompatActivity {
                     if(selection[id]) {
                         cb.setChecked(false);
                         selection[id] = false;
+                        total--;
                     }
                     else {
-                        Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
                         cb.setChecked(true);
                         selection[id] = true;
+                        total++;
                     }
                 }
             });

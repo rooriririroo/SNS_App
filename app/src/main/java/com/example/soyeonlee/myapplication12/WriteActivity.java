@@ -45,10 +45,12 @@ import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
 
 public class WriteActivity extends AppCompatActivity {
 
@@ -102,7 +104,7 @@ public class WriteActivity extends AppCompatActivity {
                 }
                 else {
                     Intent intent = new Intent(WriteActivity.this,GalleryActivity.class);
-                    startActivity(intent);
+                    startActivityForResult(intent,1);
                 }
             }
         });
@@ -155,16 +157,15 @@ public class WriteActivity extends AppCompatActivity {
 
     }
 
-    public void saveClick(View v) {
-        Toast.makeText(getApplicationContext(),"완료",Toast.LENGTH_SHORT).show();
-        finish();
-    }
-
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == 1) {
             if(resultCode == RESULT_OK) {
                 try {
-                    uri_image = data.getData();
+                    data = getIntent();
+                    //ArrayList<String> arrPath = intent.getStringArrayListExtra("files");
+                    Toast.makeText(getApplicationContext(),data.getStringArrayListExtra("files").toString(),Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(),add_arr,Toast.LENGTH_SHORT).show();
+                    //uri_image = data.getData();
 
                     /*ArrayList imageList = new ArrayList<>();
 
@@ -225,7 +226,7 @@ public class WriteActivity extends AppCompatActivity {
 
                     final EditText textForImage = new EditText(getApplicationContext());
                     textForImage.setPadding(30,0,30,0);
-                    textForImage.setText(uri_image.toString());
+                    textForImage.setText("");
                     textForImage.setCursorVisible(false);
                     textForImage.setBackgroundColor(Color.TRANSPARENT);
 
@@ -416,6 +417,9 @@ public class WriteActivity extends AppCompatActivity {
                 builder.show();
                 return true;
             case R.id.menu_save_button :
+                Intent intent = getIntent();
+
+                Toast.makeText(getApplicationContext(),intent.getStringArrayListExtra("files").toString(),Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
