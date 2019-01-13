@@ -7,9 +7,12 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,11 +24,15 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.mikepenz.actionitembadge.library.ActionItemBadge;
+import com.mikepenz.actionitembadge.library.ActionItemBadgeAdder;
+import com.mikepenz.actionitembadge.library.utils.UIUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,17 +49,29 @@ public class GridActivity extends AppCompatActivity {
     int total = 0;
     int badgeCount = 0;
     ArrayList<String> arrPath;
+    ArrayList<String> arrPathIntent;
+    TextView badgeNum;
+
+    int REQUEST_GRID = 1001;
+    int RESULT_GRID = 1006;
+    int RESULT_FROM_GRID = 1010;
+    int SEND_IMAGE = 1008;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grid);
 
+        GalleryActivity galleryActivity = (GalleryActivity) GalleryActivity._galleryActivity;
+
+        Log.d("[Grid]=>","onCreate");
+
         gridView = findViewById(R.id.grid);
         gridItemArrayList = new ArrayList<GridItem>();
         adapter = new GridItemAdapter(this,gridItemArrayList);
         gridView.setAdapter(adapter);
         arrPath = new ArrayList<String>();
+        arrPathIntent = new ArrayList<String>();
 
         Intent intent = getIntent();
         String path = intent.getStringExtra("folderPath");
@@ -79,6 +98,7 @@ public class GridActivity extends AppCompatActivity {
         for(File file : files) {
             if(file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
                 gridItemArrayList.add(new GridItem(file.getAbsolutePath()));
+                arrPathIntent.add(file.getAbsolutePath());
                 count++;
             }
         }
@@ -88,10 +108,38 @@ public class GridActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("[Grid]=>","onPause");
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //inflater.inflate(R.menu.menu_attach, menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_attach,menu);
+
+        RelativeLayout relativeLayout = (RelativeLayout) menu.findItem(R.id.menu_attach_button).getActionView();
+        badgeNum = relativeLayout.findViewById(R.id.attach_num);
+        badgeNum.setVisibility(View.INVISIBLE);
+        //textView.setText("10");
+
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent dataIntent = new Intent(GridActivity.this,GalleryActivity.class);
+                //dataIntent.putExtra("files",arrPath);
+                //setResult(RESULT_GRID,dataIntent);
+                //finish();
+
+                Intent intent = new Intent(GridActivity.this,WriteActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.putExtra("images",arrPath);
+                //setResult(RESULT_FROM_GRID,intent);
+                startActivity(intent);
+            }
+        });
+
         return true;
     }
 
@@ -105,8 +153,17 @@ public class GridActivity extends AppCompatActivity {
                 //Toast.makeText(getApplicationContext(),String.valueOf(total),Toast.LENGTH_SHORT).show();
                 //Toast.makeText(getApplicationContext(),arrPath.toString(),Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(GridActivity.this,WriteActivity.class);
+                intent.putExtra("images",arrPath);
+                setResult(RESULT_FROM_GRID);
+                startActivity(intent);
+                //TextView textView = findViewById(R.id.attach_num);
+                //textView.setVisibility(View.INVISIBLE);
                 //intent.putExtra("hello","hello");
+
+
+                /*
                 if(total == 1) {
+                    //Toast.makeText(getApplicationContext(),arrPathIntent.toString(),Toast.LENGTH_SHORT).show();
                     intent.putExtra("file",arrPath.get(0));
                     startActivity(intent);
                 }
@@ -114,7 +171,7 @@ public class GridActivity extends AppCompatActivity {
                     intent.putExtra("files",arrPath);
                     setResult(RESULT_OK);
                     startActivity(intent);
-                }
+                }*/
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
@@ -176,6 +233,10 @@ public class GridActivity extends AppCompatActivity {
                     intent.putExtra("filePath",gridItemArrayList.get(id).getGridImage());
                     intent.putExtra("fileNum",String.valueOf(id+1));
                     intent.putExtra("fileTotal",String.valueOf(count));
+                    intent.putExtra("AllFiles",arrPathIntent);//
+                    intent.putExtra("filePosition",String.valueOf(id));
+                    intent.putExtra("fileSelect",String.valueOf(total));
+                    intent.putExtra("images",arrPath);
                     context.startActivity(intent);
                 }
             });
@@ -191,6 +252,10 @@ public class GridActivity extends AppCompatActivity {
                         selection[id] = false;
                         total--;
                         arrPath.remove(gridItemArrayList.get(id).getGridImage());
+
+                        if(total == 0)
+                            badgeNum.setVisibility(View.INVISIBLE);
+                        badgeNum.setText(String.valueOf(total));
                     }
                     else {
                         //Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
@@ -198,6 +263,10 @@ public class GridActivity extends AppCompatActivity {
                         selection[id] = true;
                         total++;
                         arrPath.add(gridItemArrayList.get(id).getGridImage());
+
+                        if(total == 1)
+                            badgeNum.setVisibility(View.VISIBLE);
+                        badgeNum.setText(String.valueOf(total));
                     }
                 }
             });

@@ -26,6 +26,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,22 +65,28 @@ public class WriteActivity extends AppCompatActivity {
     Button vote_button;
     Button map_button;
 
-    Uri uri_image;
-    Uri uri_video;
     Uri uri_file;
     LinearLayout linearLayout;
     String image;
 
-    VideoView videoView;
-    VideoView videoView2;
+    int REQUEST_IMAGE = 1000;
+    int REQUEST_VIDEO = 1010;
+    int REQUEST_FILE = 1020;
+    int REQUEST_VOTE = 1030;
+    int REQUEST_MAP = 1040;
+    int RESULT_IMAGE = 1005;
+    int RESULT_VIDEO = 1015;
+
+    ArrayList<String> imagePath = new ArrayList<String>();
+    ArrayList<String> videoPath = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
-        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        //getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
+        Log.d("[Write]=>","onCreate");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("글쓰기");
 
@@ -90,9 +97,6 @@ public class WriteActivity extends AppCompatActivity {
         main_edit.setHint("글을 입력하세요.");
         main_edit.setBackgroundColor(Color.TRANSPARENT);
         linearLayout.addView(main_edit,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
-        //videoView2 = findViewById(R.id.videoView);
-        //videoView2.setVideoURI(uri_video);
-        //Toast.makeText(getApplicationContext(),uri_video.toString(),Toast.LENGTH_SHORT).show();
 
         image_button = (Button) findViewById(R.id.image_button);
         image_button.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +108,7 @@ public class WriteActivity extends AppCompatActivity {
                 }
                 else {
                     Intent intent = new Intent(WriteActivity.this,GalleryActivity.class);
-                    startActivityForResult(intent,1);
+                    startActivity(intent);
                 }
             }
         });
@@ -131,7 +135,7 @@ public class WriteActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setType("*/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent,3);
+                startActivityForResult(intent,REQUEST_FILE);
             }
         });
 
@@ -149,7 +153,7 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(),MapsActivity.class);
-                startActivityForResult(intent,4);
+                startActivityForResult(intent,REQUEST_MAP);
             }
         });
 
@@ -157,127 +161,153 @@ public class WriteActivity extends AppCompatActivity {
 
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1) {
-            if(resultCode == RESULT_OK) {
-                try {
-                    data = getIntent();
-                    //ArrayList<String> arrPath = intent.getStringArrayListExtra("files");
-                    Toast.makeText(getApplicationContext(),data.getStringArrayListExtra("files").toString(),Toast.LENGTH_SHORT).show();
-                    //Toast.makeText(getApplicationContext(),add_arr,Toast.LENGTH_SHORT).show();
-                    //uri_image = data.getData();
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d("[Write]=>","onNewIntent");
 
-                    /*ArrayList imageList = new ArrayList<>();
+        if(intent.hasExtra("images")) {
+            imagePath = intent.getStringArrayListExtra("images");
+            for(int i=0; i<imagePath.size(); i++) {
+                final ImageView image = new ImageView(getApplicationContext());
+                image.setPadding(30,0,30,0);
+                image.setAdjustViewBounds(true);
+                image.setColorFilter(88000000);
+                Glide.with(getApplicationContext()).load(imagePath.get(i)).into(image);
+                linearLayout.addView(image);
 
-                    ImageView image = new ImageView(getApplicationContext());
-                    if(data.getClipData() == null) {
-                        imageList.add(String.valueOf(data.getData()));
+                final EditText textForImage = new EditText(getApplicationContext());
+                textForImage.setPadding(30,0,30,0);
+                textForImage.setText("");
+                textForImage.setCursorVisible(false);
+                textForImage.setBackgroundColor(Color.TRANSPARENT);
+
+                textForImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        textForImage.setCursorVisible(true);
+                        textForImage.requestFocus();
                     }
-                    else {
-                        ClipData clipData = data.getClipData();
-                        if(clipData.getItemCount() > 10) {
-                            Toast.makeText(WriteActivity.this,"한 번에 10개까지 선택 가능",Toast.LENGTH_SHORT).show();
-                        }
-                        else if(clipData.getItemCount() == 1) {
-                            String dataStr = String.valueOf(clipData.getItemAt(0).getUri());
-                            imageList.add(dataStr);
-                            image.setImageURI(Uri.parse(dataStr));
-                            linearLayout.addView(image);
-                        }
-                        else if(clipData.getItemCount() > 1 && clipData.getItemCount() < 10) {
-                            for(int i=0; i<clipData.getItemCount(); i++) {
-                                String dataStr = String.valueOf(clipData.getItemAt(i).getUri());
-                                imageList.add(dataStr);
-                                image.setImageURI(Uri.parse(dataStr));
-                                linearLayout.addView(image);
+                });
+                linearLayout.addView(textForImage);
+
+                final CharSequence[] items = {"삭제"};
+                image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //image.setBackgroundResource(R.drawable.image_border);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(WriteActivity.this);
+                        builder.setTitle("");
+                        builder.setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                image.setVisibility(View.GONE);
+                                textForImage.setVisibility(View.GONE);
+                                //Toast.makeText(getApplicationContext(),items[which],Toast.LENGTH_SHORT).show();
                             }
-                        }
-                    }*/
-
-                    /*InputStream in = getContentResolver().openInputStream(uri_image);
-                    Bitmap img = BitmapFactory.decodeStream(in);
-                    in.close();*/
-
-                    /*
-                    String wholeID = DocumentsContract.getDocumentId(uri_image);
-                    String id = wholeID.split(":")[1];
-                    String[] column = {MediaStore.Images.Media.DATA};
-                    String sel = MediaStore.Images.Media._ID + "=?";
-                    Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            column,sel,new String[]{id},null);
-                    String filePath = "";
-                    int columnIndex = cursor.getColumnIndex(column[0]);
-                    if(cursor.moveToFirst()) {
-                        filePath = cursor.getString(columnIndex);
+                        });
+                        builder.show();
                     }
-                    cursor.close();*/
+                });
 
-                    /*
-                    ImageView imageView = new ImageView(getApplicationContext());
-                    imageView.setPadding(30,0,30,0);
-                    imageView.setAdjustViewBounds(true);
-                    imageView.setImageURI(uri_image);
-                    //imageView.setImageBitmap(img);
-                    linearLayout.addView(imageView);*/
-
-
-
-                    //Toast.makeText(getApplicationContext(),uri_image.toString(),Toast.LENGTH_SHORT).show();
-
-                    final EditText textForImage = new EditText(getApplicationContext());
-                    textForImage.setPadding(30,0,30,0);
-                    textForImage.setText("");
-                    textForImage.setCursorVisible(false);
-                    textForImage.setBackgroundColor(Color.TRANSPARENT);
-
-                    textForImage.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            textForImage.setCursorVisible(true);
-                            textForImage.requestFocus();
-                            return false;
-                        }
-                    });
-                    linearLayout.addView(textForImage);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                /*
+                textForImage.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        textForImage.setCursorVisible(true);
+                        textForImage.requestFocus();
+                        return false;
+                    }
+                });*/
             }
         }
-        else if(requestCode == 2) {
-            if(resultCode == RESULT_OK) {
-                try {
-                    uri_video = data.getData();
-                    //videoView2.setVideoURI(uri_video);
-                    //videoView2.requestFocus();
-                    //videoView2.start();
 
-                    ImageView video = new ImageView(getApplicationContext());
+        if(intent.hasExtra("videos")) {
+            videoPath = intent.getStringArrayListExtra("videos");
+            for(int i=0; i<videoPath.size(); i++) {
+                final ImageView video = new ImageView(getApplicationContext());
+                video.setPadding(30,0,30,0);
+                video.setAdjustViewBounds(true);
+                Glide.with(getApplicationContext()).load(videoPath.get(i)).into(video);
+                linearLayout.addView(video);
 
-                    Glide.with(getApplicationContext()).load(uri_video).override(1000,800).into(video);
-                    linearLayout.addView(video);
-                    //Toast.makeText(getApplicationContext(),uri_video.toString(),Toast.LENGTH_SHORT).show();
-                    final EditText textForVideo = new EditText(getApplicationContext());
-                    textForVideo.setPadding(30,0,30,0);
-                    textForVideo.setText("");
-                    textForVideo.setCursorVisible(false);
-                    textForVideo.setBackgroundColor(Color.TRANSPARENT);
+                final EditText textForVideo = new EditText(getApplicationContext());
+                textForVideo.setPadding(30,0,30,0);
+                textForVideo.setText("");
+                textForVideo.setCursorVisible(false);
+                textForVideo.setBackgroundColor(Color.TRANSPARENT);
 
-                    textForVideo.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            textForVideo.setCursorVisible(true);
-                            textForVideo.requestFocus();
-                            return false;
-                        }
-                    });
-                    linearLayout.addView(textForVideo);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                textForVideo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        textForVideo.setCursorVisible(true);
+                        textForVideo.requestFocus();
+                    }
+                });
+                linearLayout.addView(textForVideo);
+
+                final CharSequence[] items = {"삭제"};
+                video.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //video.setBackgroundResource(R.drawable.image_border);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(WriteActivity.this);
+                        builder.setTitle("");
+                        builder.setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                video.setVisibility(View.GONE);
+                                textForVideo.setVisibility(View.GONE);
+                                //Toast.makeText(getApplicationContext(),items[which],Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        builder.show();
+                    }
+                });
+
+                /*
+                textForVideo.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        textForVideo.setCursorVisible(true);
+                        textForVideo.requestFocus();
+                        return false;
+                    }
+                });*/
             }
         }
-        else if(requestCode == 3) {
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("[Write]=>","onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("[Write]=>","onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("[Write]=>","onPause");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("[Write]=>","onRestart");
+
+        //Intent intent = getIntent();
+        //if(intent.getStringExtra("files") != null)
+          //  Toast.makeText(getApplicationContext(),intent.getStringArrayListExtra("files").toString(),Toast.LENGTH_SHORT).show();
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_FILE) {
             if(resultCode == RESULT_OK) {
                 try {
                     uri_file = data.getData();
@@ -296,6 +326,16 @@ public class WriteActivity extends AppCompatActivity {
                     textForFile.setCursorVisible(false);
                     textForFile.setBackgroundColor(Color.TRANSPARENT);
 
+                    textForFile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            textForFile.setCursorVisible(true);
+                            textForFile.requestFocus();
+                        }
+                    });
+                    linearLayout.addView(textForFile);
+
+                    /*
                     textForFile.setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View v, MotionEvent event) {
@@ -303,14 +343,13 @@ public class WriteActivity extends AppCompatActivity {
                             textForFile.requestFocus();
                             return false;
                         }
-                    });
-                    linearLayout.addView(textForFile);
+                    });*/
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-        else if(requestCode == 4) {
+        if(requestCode == REQUEST_MAP) {
             if(resultCode == RESULT_OK) {
                 //Intent intent = getIntent();
                 String address = data.getStringExtra("Address");
@@ -330,6 +369,15 @@ public class WriteActivity extends AppCompatActivity {
                 textForMap.setCursorVisible(false);
                 textForMap.setBackgroundColor(Color.TRANSPARENT);
 
+                textForMap.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        textForMap.setCursorVisible(true);
+                        textForMap.requestFocus();
+                    }
+                });
+                linearLayout.addView(textForMap);
+                /*
                 textForMap.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
@@ -338,7 +386,7 @@ public class WriteActivity extends AppCompatActivity {
                         return false;
                     }
                 });
-                linearLayout.addView(textForMap);
+                linearLayout.addView(textForMap);*/
             }
         }
     }
@@ -360,29 +408,6 @@ public class WriteActivity extends AppCompatActivity {
                 result = uri.getLastPathSegment();
         }
         return result;
-    }
-
-    private String getRealPath2(Uri cUri) {
-        String[] filePathColumn = { MediaStore.Images.Media.DATA };
-        Cursor cursor = getContentResolver().query(cUri,filePathColumn, null, null, null);
-        cursor.moveToFirst();
-        int columnindex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
-        String file_path = cursor.getString(columnindex);
-        Uri fileUri = Uri.parse("file://" + file_path);
-        cursor.close();
-
-        return fileUri.toString();
-        //launchUploadActivity(true, PICK_IMAGE);
-    }
-
-    private String getRealPath(Uri cUri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(cUri,projection,null,null,null);
-        cursor.moveToNext();
-        String path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
-        Uri uri = Uri.fromFile(new File(path));
-        cursor.close();
-        return path;
     }
 
     @Override
@@ -418,6 +443,12 @@ public class WriteActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_save_button :
                 Intent intent = getIntent();
+                ArrayList<String> filePath = intent.getStringArrayListExtra("files");
+                for(int i=0; i<filePath.size(); i++) {
+                    ImageView image = new ImageView(getApplicationContext());
+                    Glide.with(getApplicationContext()).load(filePath.get(i)).into(image);
+                    linearLayout.addView(image);
+                }
 
                 Toast.makeText(getApplicationContext(),intent.getStringArrayListExtra("files").toString(),Toast.LENGTH_SHORT).show();
                 return true;

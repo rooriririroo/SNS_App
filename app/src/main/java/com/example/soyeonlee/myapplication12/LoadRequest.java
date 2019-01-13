@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoadRequest extends StringRequest {
-    final static private String URL = "http://172.30.1.5:8888/android_login_api/load.php";
+    final static private String URL = "http://192.168.0.4:8888/android_login_api/load.php";
     private Map<String, String> parameters;
 
     public LoadRequest(String userID, Response.Listener<String> listener) {

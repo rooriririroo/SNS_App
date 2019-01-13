@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,8 @@ public class VideoGridActivity extends AppCompatActivity {
     int count = 0;
     boolean[] selection;
     int total = 0;
+    TextView badgeNum;
+    ArrayList<String> arrPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,7 @@ public class VideoGridActivity extends AppCompatActivity {
         gridItemArrayList = new ArrayList<GridItem>();
         adapter = new VideoGridItemAdapter(this,gridItemArrayList);
         gridView.setAdapter(adapter);
+        arrPath = new ArrayList<String>();
 
         Intent intent = getIntent();
         String path = intent.getStringExtra("folderPath");
@@ -78,6 +82,23 @@ public class VideoGridActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_attach,menu);
+
+        RelativeLayout relativeLayout = (RelativeLayout) menu.findItem(R.id.menu_attach_button).getActionView();
+        badgeNum = relativeLayout.findViewById(R.id.attach_num);
+        badgeNum.setVisibility(View.INVISIBLE);
+        //textView.setText("10");
+
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(VideoGridActivity.this,WriteActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.putExtra("videos",arrPath);
+                //setResult(RESULT_FROM_GRID,intent);
+                startActivity(intent);
+            }
+        });
+
         return true;
     }
 
@@ -164,12 +185,22 @@ public class VideoGridActivity extends AppCompatActivity {
                         cb.setChecked(false);
                         selection[id] = false;
                         total--;
+                        arrPath.remove(gridItemArrayList.get(id).getGridImage());
+
+                        if(total == 0)
+                            badgeNum.setVisibility(View.INVISIBLE);
+                        badgeNum.setText(String.valueOf(total));
                     }
                     else {
                         //Toast.makeText(getApplicationContext(),String.valueOf(id),Toast.LENGTH_SHORT).show();
                         cb.setChecked(true);
                         selection[id] = true;
                         total++;
+                        arrPath.add(gridItemArrayList.get(id).getGridImage());
+
+                        if(total == 1)
+                            badgeNum.setVisibility(View.VISIBLE);
+                        badgeNum.setText(String.valueOf(total));
                     }
                 }
             });

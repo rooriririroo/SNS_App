@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_attach_button"
+        app:actionLayout="@layout/custom_actionbar_badge"
         android:title="첨부"
         app:showAsAction="always" />
-
 </menu>

@@ -1,5 +1,6 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,19 +33,33 @@ import java.util.Locale;
 
 public class GalleryActivity extends AppCompatActivity {
 
+    public static Activity _galleryActivity;
+
     ArrayList<GalleryListItem> galleryListItemArrayList;
     GalleryListItemAdapter adapter;
     ListView listView;
-    int count = 0;
+    //int count = 0;
     String state = Environment.getExternalStorageState();
+    File[] files;
+    ArrayList<String> filePath = new ArrayList<String>();
+
+    int SEND_IMAGE = 1008;
+    int REQUEST_GRID = 1001;
+    int RESULT_GRID = 1006;
+    int RESULT_IMAGE = 1005;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
+        _galleryActivity = GalleryActivity.this;
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("사진");
+
+        Log.d("[Gallery]=>","onCreate");
 
         galleryListItemArrayList = new ArrayList<GalleryListItem>();
         listView = findViewById(R.id.gallery_list);
@@ -72,19 +88,40 @@ public class GalleryActivity extends AppCompatActivity {
                 intent.putExtra("folderPath",galleryListItemArrayList.get(position).getGalleryPath());
                 intent.putExtra("folderName",galleryListItemArrayList.get(position).getGalleryTitle());
                 startActivity(intent);
+                //startActivityForResult(intent,REQUEST_GRID);
 
-                Intent writeIntent = new Intent(GalleryActivity.this,WriteActivity.class);
-                setResult(RESULT_OK,writeIntent);
+                //Intent writeIntent = new Intent(GalleryActivity.this,WriteActivity.class);
+                //setResult(RESULT_OK,writeIntent);
             }
         });
     }
 
-    public void backClick(View v) {
-        Toast.makeText(getApplicationContext(),String.valueOf(count),Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("[Gallery]=>","onPause");
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_GRID) {
+            if(resultCode == RESULT_GRID) {
+                Intent intent = new Intent(this,WriteActivity.class);
+                intent.putExtra("files",data.getStringArrayListExtra("files"));
+                setResult(RESULT_IMAGE,intent);
+                startActivity(intent);
+            }
+        }
+    }
+
+    /*
+    public void backClick(View v) {
+        Toast.makeText(getApplicationContext(),String.valueOf(count),Toast.LENGTH_SHORT).show();
+    }*/
+
     public void galleryList(File directory) {
-        File[] files = directory.listFiles();// 최상위 폴더 내 파일 및 폴더 목록 /camera, /DCIM ...
+        int flag = 0;
+        files = directory.listFiles();// 최상위 폴더 내 파일 및 폴더 목록 /camera, /DCIM ...
+        int count = 0;
         Arrays.sort(files, new Comparator<File>() {
             @Override
             public int compare(File o1, File o2) {
@@ -103,13 +140,33 @@ public class GalleryActivity extends AppCompatActivity {
             }
             else if(file.isFile()) {
                 if(file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
+                    //File parentDirectory = new File(file.getParent());
+                    //if(!parentDirectory.getName().equals(galleryListItemArrayList.get(0).getGalleryTitle())) {
+                      //  galleryListItemArrayList.add(new GalleryListItem(file.getAbsolutePath(),parentDirectory.getName(),String.valueOf(files.length),file.getParent()));
+                    //}
+                    //count++;
+                    //filePath.add(file.getAbsolutePath());
                     File parentDirectory = new File(file.getParent());
                     galleryListItemArrayList.add(new GalleryListItem(file.getAbsolutePath(),parentDirectory.getName(),String.valueOf(files.length),file.getParent()));
                     break;
                 }
             }
         }
+
+
+        ArrayList<String> listPath = new ArrayList<String>();
+        for(int i=0; i<filePath.size(); i++) {
+            if(!listPath.contains(filePath.get(i))) {
+                listPath.add(filePath.get(i));
+            }
+        }
+
+        for(int i=0; i<listPath.size(); i++) {
+            File listName = new File(listPath.get(i));
+            //galleryListItemArrayList.add(new GalleryListItem(listName.toString(),listName.getName(),String.valueOf(count),listName.getParent()));
+        }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

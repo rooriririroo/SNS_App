@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -29,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("[Main]=>","onCreate");
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tl_tabs);
         Fragment[] arrFragments = new Fragment[4];
         arrFragments[0] = new HomeFragment();
@@ -48,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString("userID",userID);
         //arrFragments[2].setArguments(bundle);
         arrFragments[3].setArguments(bundle);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("[Main]=>","onPause");
     }
 
     public void addClick(View v) {
