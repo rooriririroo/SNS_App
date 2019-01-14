@@ -1,6 +1,7 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,11 @@ public class VideoGalleryActivity extends AppCompatActivity {
     ListView listView;
     int count = 0;
     String state = Environment.getExternalStorageState();
+
+    String captureFilePath;
+    String captureFolderName = "RUSH";
+
+    int CAPTURE_VIDEO = 2001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,9 +120,30 @@ public class VideoGalleryActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_camera_button :
                 Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                startActivity(Intent.createChooser(intent,"사용할 애플리케이션 : "));
+
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+                String folderPath = path + File.separator + "RUSH";
+                captureFilePath = path + File.separator + captureFolderName + File.separator + String.valueOf(System.currentTimeMillis()) + ".mp4";
+                File newFolderPath = new File(folderPath);
+                newFolderPath.mkdir();
+                File file = new File(captureFilePath);
+                Uri output = Uri.fromFile(file);
+
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,output);
+                startActivityForResult(Intent.createChooser(intent,"사용할 애플리케이션 : "),CAPTURE_VIDEO);
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CAPTURE_VIDEO) {
+            if(resultCode == RESULT_OK) {
+                //data.setDataAndType(output,"image/*");
+                Intent intent = new Intent(VideoGalleryActivity.this,CaptureVideoActivity.class);
+                intent.putExtra("captureVideo",captureFilePath);
+                startActivity(intent);
+            }
+        }
     }
 }

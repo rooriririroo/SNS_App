@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +49,12 @@ public class GalleryActivity extends AppCompatActivity {
     int REQUEST_GRID = 1001;
     int RESULT_GRID = 1006;
     int RESULT_IMAGE = 1005;
+    int CAPTURE_IMAGE = 2000;
+
+    Uri imageCaptureUri;
+
+    String captureFilePath;
+    String captureFolderName = "RUSH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +96,6 @@ public class GalleryActivity extends AppCompatActivity {
                 intent.putExtra("folderPath",galleryListItemArrayList.get(position).getGalleryPath());
                 intent.putExtra("folderName",galleryListItemArrayList.get(position).getGalleryTitle());
                 startActivity(intent);
-                //startActivityForResult(intent,REQUEST_GRID);
-
-                //Intent writeIntent = new Intent(GalleryActivity.this,WriteActivity.class);
-                //setResult(RESULT_OK,writeIntent);
             }
         });
     }
@@ -100,17 +104,6 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d("[Gallery]=>","onPause");
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_GRID) {
-            if(resultCode == RESULT_GRID) {
-                Intent intent = new Intent(this,WriteActivity.class);
-                intent.putExtra("files",data.getStringArrayListExtra("files"));
-                setResult(RESULT_IMAGE,intent);
-                startActivity(intent);
-            }
-        }
     }
 
     /*
@@ -167,7 +160,6 @@ public class GalleryActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -183,9 +175,30 @@ public class GalleryActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_camera_button :
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivity(Intent.createChooser(intent,"사용할 애플리케이션 : "));
+
+                String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+                String folderPath = path + File.separator + "RUSH";
+                captureFilePath = path + File.separator + captureFolderName + File.separator + String.valueOf(System.currentTimeMillis()) + ".jpg";
+                File newFolderPath = new File(folderPath);
+                newFolderPath.mkdir();
+                File file = new File(captureFilePath);
+                Uri output = Uri.fromFile(file);
+
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,output);
+                startActivityForResult(Intent.createChooser(intent,"사용할 애플리케이션 : "),CAPTURE_IMAGE);
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CAPTURE_IMAGE) {
+            if(resultCode == RESULT_OK) {
+                //data.setDataAndType(output,"image/*");
+                Intent intent = new Intent(GalleryActivity.this,CaptureImageActivity.class);
+                intent.putExtra("captureImage",captureFilePath);
+                startActivity(intent);
+            }
+        }
     }
 }

@@ -57,7 +57,9 @@
         <activity android:name=".VideoActivity" />
         <activity android:name=".VideoGalleryActivity" />
         <activity android:name=".VideoGridActivity" />
-        <activity android:name=".VideoDetailActivity"></activity>
+        <activity android:name=".VideoDetailActivity" />
+        <activity android:name=".CaptureImageActivity" />
+        <activity android:name=".CaptureVideoActivity"></activity>
     </application>
 
 </manifest>
