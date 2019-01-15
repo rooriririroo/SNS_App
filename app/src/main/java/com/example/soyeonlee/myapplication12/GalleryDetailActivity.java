@@ -99,16 +99,17 @@ public class GalleryDetailActivity extends AppCompatActivity {
             TextView text_num = v.findViewById(R.id.gallerydetail_num);
             TextView text_total = v.findViewById(R.id.gallerydetail_total);
             TextView text_badge = v.findViewById(R.id.gallerydetail_badge);
-            CheckBox checkBox = v.findViewById(R.id.gallerydetail_check);
+            //CheckBox checkBox = v.findViewById(R.id.gallerydetail_check);
 
             Glide.with(getApplicationContext()).load(imageSliderList.get(position)).into(imageView);
             text_num.setText(String.valueOf(position+1));
             text_total.setText(String.valueOf(imageSliderList.size()));
-            text_badge.setVisibility(View.INVISIBLE);
+            text_badge.setVisibility(View.GONE);
             if(arrPath.size()>0) {
                 text_badge.setText(String.valueOf(arrPath.size()));
                 text_badge.setVisibility(View.VISIBLE);
             }
+            /*
             checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -117,7 +118,7 @@ public class GalleryDetailActivity extends AppCompatActivity {
 
                     }
                 }
-            });
+            });*/
 
             container.addView(v);
             return v;

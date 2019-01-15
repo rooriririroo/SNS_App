@@ -1,6 +1,7 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,8 @@ public class VoteActivity extends AppCompatActivity {
     Switch vote_switch_anonymity;
     Switch vote_switch_addition;
 
+    EditText vote_title;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +34,8 @@ public class VoteActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("투표");
+
+        vote_title = findViewById(R.id.vote_title);
 
         vote_switch_plural = findViewById(R.id.vote_switch_plural);
         vote_switch_plural.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -110,6 +115,10 @@ public class VoteActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_save_button :
+                Intent intent = new Intent(VoteActivity.this, WriteActivity.class);
+                intent.putExtra("VoteTitle",vote_title.getText().toString());
+                setResult(RESULT_OK,intent);
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);

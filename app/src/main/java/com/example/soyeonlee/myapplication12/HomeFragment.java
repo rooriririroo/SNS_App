@@ -21,12 +21,17 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
-    SQLiteDatabase user_db;
-    SQLiteDatabase list_db;
     UserInfoDBHelper user_helper;
     ListDBHelper list_helper;
 
@@ -74,7 +79,7 @@ public class HomeFragment extends Fragment {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        delete_values(p);
+                        //delete_values(p);
                         Toast.makeText(getContext(),"삭제",Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -100,8 +105,6 @@ public class HomeFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        //load_values();
-
         return rootView;
     }
 
@@ -123,52 +126,35 @@ public class HomeFragment extends Fragment {
     }
 
     public void load_values() {
+        Response.Listener<String> responseListener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try{
+                    JsonParser parser = new JsonParser();
+                    JsonObject jsonResponse = (JsonObject) parser.parse(response);
+                    JsonArray array = (JsonArray) jsonResponse.get("response");
+                    for(int i = 0; i<array.size(); i++) {
+                        JsonObject object = (JsonObject) array.get(i);
 
-        //user_db = user_helper.getReadableDatabase();
-        int recordCount = -1;
-
-        /*
-        if(user_db != null) {
-            Cursor c = user_db.rawQuery(UserInfoContractDB.SQL_SELECT,null);
-            recordCount = c.getCount();
-            listItemArrayList.clear();
-            for(int i = 0; i<recordCount; i++) {
-                c.moveToNext();
-                String profileStr = c.getString(1);
-                String nameStr = c.getString(2);
-                listItemArrayList.add(new ListItem(profileStr,nameStr));
+                        String inputText = object.get("inputText").getAsString();
+                        String inputImage = object.get("inputImage").getAsString();
+                        String inputVideo = object.get("inputVideo").getAsString();
+                        listItemArrayList.add(new ListItem(inputText,inputImage,inputVideo));
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            c.close();
-            adapter.notifyDataSetChanged();
-        }*/
+        };
 
-        list_db = list_helper.getReadableDatabase();
-        if(list_db != null) {
-            Cursor c = list_db.rawQuery(ListContractDB.SQL_SELECT,null);
-            recordCount = c.getCount();
-            listItemArrayList.clear();
-            for(int i = 0; i<recordCount; i++) {
-                c.moveToNext();
-                String dateStr = c.getString(1);
-                String textStr = c.getString(2);
-                String imageStr = c.getString(3);
-                listItemArrayList.add(new ListItem(dateStr,textStr,imageStr));
-            }
-            c.close();
-            adapter.notifyDataSetChanged();
-        }
+        LoadWritingRequest loadWritingRequest = new LoadWritingRequest(responseListener);
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        queue.add(loadWritingRequest);
     }
 
     public void delete_values(int p) {
-        list_db = list_helper.getWritableDatabase();
-        String sqlSelect = ListContractDB.SQL_SELECT;
-        Cursor c = list_db.rawQuery(sqlSelect,null);
-        c.moveToPosition(p);
-        int id = c.getInt(0);
-        String sqlDelete = ListContractDB.SQL_DELETE + id;
-        list_db.execSQL(sqlDelete);
-        adapter.notifyDataSetChanged();
-        c.close();//
-        list_db.close();
+
     }
 }

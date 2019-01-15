@@ -4,14 +4,6 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <CheckBox
-        android:id="@+id/gallerydetail_check"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:layout_marginStart="10dp"
-        android:button="@drawable/checkbox" />
-
     <ImageView
         android:id="@+id/gallerydetail_image"
         android:layout_width="wrap_content"

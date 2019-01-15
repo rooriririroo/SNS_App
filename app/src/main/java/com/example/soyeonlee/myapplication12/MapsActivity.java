@@ -21,12 +21,17 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -34,7 +39,11 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.places.Place;
+
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -72,6 +81,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int PLACE_PICKER_REQUEST = 1;
     private static final LatLngBounds BOUNDS_VIEW = new LatLngBounds(new LatLng(37.56, 126.98), new LatLng(37.57, 127.02));
 
+    Button map_search_button;
+    TextView map_result_title;
+    TextView map_result_count;
+    ListView map_result_list;
+    Button map_result_down;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +94,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("지도");
+
+        /*
+        map_result_title = findViewById(R.id.map_result_title);
+        map_result_count = findViewById(R.id.map_result_count);
+        map_result_down = findViewById(R.id.map_result_down);
+        map_result_list = findViewById(R.id.map_result_list);
+
+        map_search_button = findViewById(R.id.map_search_button);
+        map_search_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                map_result_title.setVisibility(View.VISIBLE);
+                map_result_count.setVisibility(View.VISIBLE);
+                map_result_down.setVisibility(View.VISIBLE);
+                map_result_list.setVisibility(View.VISIBLE);
+            }
+        });*/
 
         locationRequest = new LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 //.setInterval(UPDATE_INTERVAL_MS).setFastestInterval(FASTEST_UPDATE_INTERVAL_MS); // 이걸 설정하면 계속 초기 좌표로 돌아감
@@ -89,6 +121,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(final Place place) {
+                currentMarker.remove();
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(place.getLatLng());
+                markerOptions.title("이 위치 추가");
+                markerOptions.snippet(place.getName().toString());
+                //markerOptions.snippet(getCurrentAddress(place.getLatLng()));
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                markerOptions.draggable(true);
+
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
+                        intent.putExtra("Address",getCurrentAddress(place.getLatLng()));
+                        intent.putExtra("Name",place.getName());
+                        setResult(RESULT_OK,intent);
+                        //startActivity(intent);
+                        finish();
+                    }
+                });
+
+                currentMarker = mMap.addMarker(markerOptions);
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(place.getLatLng());
+                mMap.moveCamera(cameraUpdate);
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+                Toast.makeText(getApplicationContext(),place.getName(),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Status status) {
+
+            }
+        });
+
     }
 
     public void backClick(View v) {
@@ -163,29 +235,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ActivityCompat.requestPermissions( this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
             }
         }
-/*
-        findViewById(R.id.place_autocomplete_fragment).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-                try{
-                    intentBuilder.setLatLngBounds(BOUNDS_VIEW);
-                    Intent intent = intentBuilder.build(MapsActivity.this);
-                    startActivityForResult(intent,PLACE_PICKER_REQUEST);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });*/
-
-        PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-        try{
-            intentBuilder.setLatLngBounds(BOUNDS_VIEW);
-            Intent intent = intentBuilder.build(MapsActivity.this);
-            startActivityForResult(intent,PLACE_PICKER_REQUEST);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         //+,- 버튼
         googleMap.getUiSettings().setZoomControlsEnabled(true);
@@ -226,6 +275,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("[Maps]=>","onStart");
         if (checkPermission()) {
             mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
             if (mMap!=null)
@@ -236,6 +286,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("[Maps]=>","onStop");
         if (mFusedLocationClient != null) {
             mFusedLocationClient.removeLocationUpdates(locationCallback);
         }

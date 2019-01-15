@@ -23,7 +23,7 @@
         android:layout_centerInParent="true"
         android:scaleX="2"
         android:scaleY="2"
-        android:drawableStart="@drawable/outline_play_circle_outline_opacity30_18dp"/>
+        android:drawableStart="@drawable/round_play_circle_filled_opacity30_18dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"

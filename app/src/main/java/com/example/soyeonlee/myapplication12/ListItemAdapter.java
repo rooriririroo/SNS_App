@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 
@@ -26,7 +27,8 @@ public class ListItemAdapter extends BaseAdapter {
         TextView userName;
         TextView date;
         TextView writing;
-        ImageView image1;
+        ImageView image;
+        VideoView video;
         //ImageView image2;
         TextView like;
         TextView like_num;
@@ -73,7 +75,8 @@ public class ListItemAdapter extends BaseAdapter {
             viewHolder.userName = (TextView) convertView.findViewById(R.id.userName);
             viewHolder.date = (TextView) convertView.findViewById(R.id.date);
             viewHolder.writing = (TextView) convertView.findViewById(R.id.writing);
-            viewHolder.image1 = (ImageView) convertView.findViewById(R.id.image1);
+            viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
+            viewHolder.video = (VideoView) convertView.findViewById(R.id.video);
             //viewHolder.image2 = (ImageView) convertView.findViewById(R.id.image2);
             viewHolder.like = (TextView) convertView.findViewById(R.id.like);
             viewHolder.like_num = (TextView) convertView.findViewById(R.id.like_num);
@@ -95,9 +98,11 @@ public class ListItemAdapter extends BaseAdapter {
             }
         });
         viewHolder.userName.setText(listItemArrayList.get(position).getUserName());
-        viewHolder.date.setText(listItemArrayList.get(position).getDate());
-        viewHolder.writing.setText(listItemArrayList.get(position).getWriting());
-        Glide.with(context).load(listItemArrayList.get(position).getImage()).into(viewHolder.image1);
+        //viewHolder.date.setText(listItemArrayList.get(position).getDate());
+        viewHolder.writing.setText(listItemArrayList.get(position).getText());
+        Glide.with(context).load(listItemArrayList.get(position).getImage()).into(viewHolder.image);
+        viewHolder.video.setVideoPath(listItemArrayList.get(position).getVideo());
+        viewHolder.video.start();
         //Glide.with(context).load(listItemArrayList.get(position).getImage()).into(viewHolder.image2);
 
         return convertView;

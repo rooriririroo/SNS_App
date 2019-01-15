@@ -62,8 +62,6 @@ public class GridActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grid);
 
-        GalleryActivity galleryActivity = (GalleryActivity) GalleryActivity._galleryActivity;
-
         Log.d("[Grid]=>","onCreate");
 
         gridView = findViewById(R.id.grid);
@@ -121,7 +119,7 @@ public class GridActivity extends AppCompatActivity {
 
         RelativeLayout relativeLayout = (RelativeLayout) menu.findItem(R.id.menu_attach_button).getActionView();
         badgeNum = relativeLayout.findViewById(R.id.attach_num);
-        badgeNum.setVisibility(View.INVISIBLE);
+        badgeNum.setVisibility(View.GONE);
         //textView.setText("10");
 
         relativeLayout.setOnClickListener(new View.OnClickListener() {
@@ -230,13 +228,14 @@ public class GridActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     int id= v.getId();
                     Intent intent = new Intent(context,GalleryDetailActivity.class);
-                    intent.putExtra("filePath",gridItemArrayList.get(id).getGridImage());
-                    intent.putExtra("fileNum",String.valueOf(id+1));
-                    intent.putExtra("fileTotal",String.valueOf(count));
-                    intent.putExtra("AllFiles",arrPathIntent);//
-                    intent.putExtra("filePosition",String.valueOf(id));
-                    intent.putExtra("fileSelect",String.valueOf(total));
-                    intent.putExtra("images",arrPath);
+                    intent.putExtra("filePath",gridItemArrayList.get(id).getGridImage()); // 선택한 하나의 이미지 파일 경로
+                    intent.putExtra("fileNum",String.valueOf(id+1)); // 현재 폴더내 파일 아이디
+                    intent.putExtra("fileTotal",String.valueOf(count)); // 현재 폴더내 모든 이미지 파일 수
+                    intent.putExtra("AllFiles",arrPathIntent); // 현재 폴더내 모든 이미지 파일 경로 리스트
+                    intent.putExtra("filePosition",String.valueOf(id)); // 선택한 이미지 파일 아이디
+                    intent.putExtra("fileSelect",String.valueOf(total)); // 현재 폴더내 선택한 이미지 파일 수
+                    intent.putExtra("images",arrPath); // 현재 폴더내 선택한 이미지 파일 경로 리스트
+                    intent.putExtra("selection",selection[id]);
                     context.startActivity(intent);
                 }
             });
@@ -254,7 +253,7 @@ public class GridActivity extends AppCompatActivity {
                         arrPath.remove(gridItemArrayList.get(id).getGridImage());
 
                         if(total == 0)
-                            badgeNum.setVisibility(View.INVISIBLE);
+                            badgeNum.setVisibility(View.GONE);
                         badgeNum.setText(String.valueOf(total));
                     }
                     else {

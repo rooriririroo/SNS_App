@@ -85,7 +85,7 @@ public class VideoGridActivity extends AppCompatActivity {
 
         RelativeLayout relativeLayout = (RelativeLayout) menu.findItem(R.id.menu_attach_button).getActionView();
         badgeNum = relativeLayout.findViewById(R.id.attach_num);
-        badgeNum.setVisibility(View.INVISIBLE);
+        badgeNum.setVisibility(View.GONE);
         //textView.setText("10");
 
         relativeLayout.setOnClickListener(new View.OnClickListener() {
@@ -188,7 +188,7 @@ public class VideoGridActivity extends AppCompatActivity {
                         arrPath.remove(gridItemArrayList.get(id).getGridImage());
 
                         if(total == 0)
-                            badgeNum.setVisibility(View.INVISIBLE);
+                            badgeNum.setVisibility(View.GONE);
                         badgeNum.setText(String.valueOf(total));
                     }
                     else {

@@ -35,23 +35,14 @@ import java.util.Locale;
 
 public class GalleryActivity extends AppCompatActivity {
 
-    public static Activity _galleryActivity;
-
     ArrayList<GalleryListItem> galleryListItemArrayList;
     GalleryListItemAdapter adapter;
     ListView listView;
-    //int count = 0;
     String state = Environment.getExternalStorageState();
     File[] files;
     ArrayList<String> filePath = new ArrayList<String>();
 
-    int SEND_IMAGE = 1008;
-    int REQUEST_GRID = 1001;
-    int RESULT_GRID = 1006;
-    int RESULT_IMAGE = 1005;
     int CAPTURE_IMAGE = 2000;
-
-    Uri imageCaptureUri;
 
     String captureFilePath;
     String captureFolderName = "RUSH";
@@ -60,9 +51,6 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
-
-        _galleryActivity = GalleryActivity.this;
-
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("사진");
@@ -106,11 +94,6 @@ public class GalleryActivity extends AppCompatActivity {
         Log.d("[Gallery]=>","onPause");
     }
 
-    /*
-    public void backClick(View v) {
-        Toast.makeText(getApplicationContext(),String.valueOf(count),Toast.LENGTH_SHORT).show();
-    }*/
-
     public void galleryList(File directory) {
         int flag = 0;
         files = directory.listFiles();// 최상위 폴더 내 파일 및 폴더 목록 /camera, /DCIM ...
@@ -133,19 +116,12 @@ public class GalleryActivity extends AppCompatActivity {
             }
             else if(file.isFile()) {
                 if(file.getName().endsWith(".jpg") || file.getName().endsWith(".png")) {
-                    //File parentDirectory = new File(file.getParent());
-                    //if(!parentDirectory.getName().equals(galleryListItemArrayList.get(0).getGalleryTitle())) {
-                      //  galleryListItemArrayList.add(new GalleryListItem(file.getAbsolutePath(),parentDirectory.getName(),String.valueOf(files.length),file.getParent()));
-                    //}
-                    //count++;
-                    //filePath.add(file.getAbsolutePath());
                     File parentDirectory = new File(file.getParent());
                     galleryListItemArrayList.add(new GalleryListItem(file.getAbsolutePath(),parentDirectory.getName(),String.valueOf(files.length),file.getParent()));
                     break;
                 }
             }
         }
-
 
         ArrayList<String> listPath = new ArrayList<String>();
         for(int i=0; i<filePath.size(); i++) {

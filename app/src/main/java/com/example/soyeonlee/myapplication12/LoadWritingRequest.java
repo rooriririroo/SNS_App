@@ -7,11 +7,11 @@ import com.android.volley.toolbox.StringRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoadMemberRequest extends StringRequest {
-    final static private String URL = "http://192.168.0.4:8888/android_login_api/load.php";
+public class LoadWritingRequest extends StringRequest {
+    final static private String URL = "http://192.168.0.4:8888/loadWriting.php";
     private Map<String, String> parameters;
 
-    public LoadMemberRequest(Response.Listener<String> listener) {
+    public LoadWritingRequest(Response.Listener<String> listener) {
         super(Method.GET, URL, listener, null);
     }
 

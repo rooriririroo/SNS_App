@@ -4,5 +4,5 @@
         android:drawable="@drawable/outline_check_circle_outline_opacity30_18dp"/>
 
     <item android:state_checked="true"
-        android:drawable="@drawable/outline_check_circle_outline_orange_18dp" />
+        android:drawable="@drawable/baseline_check_circle_orange2_18dp" />
 </selector>

@@ -54,12 +54,11 @@
         <activity android:name=".GalleryActivity" />
         <activity android:name=".GridActivity" />
         <activity android:name=".GalleryDetailActivity" />
-        <activity android:name=".VideoActivity" />
         <activity android:name=".VideoGalleryActivity" />
         <activity android:name=".VideoGridActivity" />
-        <activity android:name=".VideoDetailActivity" />
         <activity android:name=".CaptureImageActivity" />
-        <activity android:name=".CaptureVideoActivity"></activity>
+        <activity android:name=".CaptureVideoActivity" />
+        <activity android:name=".FileActivity"></activity>
     </application>
 
 </manifest>

@@ -7,23 +7,24 @@ public class ListItem {
     private String userImage;
     private String userName;
     private String date;
-    private String writing;
+    private String text;
     private String image;
+    private String video;
     private Button like;
     private Button comment;
 
-    public ListItem(String userImage, String userName, String date, String writing, String image) {
+    public ListItem(String userImage, String userName, String date, String text, String image) {
         this.userImage = userImage;
         this.userName = userName;
         this.date = date;
-        this.writing = writing;
+        this.text = text;
         this.image = image;
     }
 
-    public ListItem(String date, String writing, String image) {
-        this.date = date;
-        this.writing = writing;
+    public ListItem(String text, String image, String video) {
+        this.text = text;
         this.image = image;
+        this.video = video;
     }
 
     public ListItem(String userImage, String userName) {
@@ -55,13 +56,6 @@ public class ListItem {
         this.date = date;
     }
 
-    public String getWriting() {
-        return writing;
-    }
-
-    public void setWriting(String writing) {
-        this.writing = writing;
-    }
 
     public String getImage() {
         return image;
@@ -85,5 +79,21 @@ public class ListItem {
 
     public void setComment(Button comment) {
         this.comment = comment;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }
