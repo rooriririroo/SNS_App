@@ -7,14 +7,16 @@ import com.android.volley.toolbox.StringRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoadRequest extends StringRequest {
-    final static private String URL = "http://192.168.0.4:8888/android_login_api/load.php";
+public class ImageRequest extends StringRequest {
+
+    final static private String URL = "http://192.168.0.4:8888/send_data.php";
     private Map<String, String> parameters;
 
-    public LoadRequest(String userID, Response.Listener<String> listener) {
+    public ImageRequest(String inputImage, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
+
         parameters = new HashMap<>();
-        parameters.put("userID", userID);
+        parameters.put("inputImage", inputImage);
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,6 +15,9 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class VoteActivity extends AppCompatActivity {
 
@@ -23,6 +27,14 @@ public class VoteActivity extends AppCompatActivity {
     Switch vote_switch_addition;
 
     EditText vote_title;
+    EditText vote_content1;
+    EditText vote_content2;
+    EditText vote_content3;
+
+    ArrayList<String> contents = new ArrayList<String>();
+    boolean isPlural = false;
+    boolean isAnonymity = false;
+    boolean isAvaliable = false;
 
 
     @Override
@@ -36,12 +48,18 @@ public class VoteActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("투표");
 
         vote_title = findViewById(R.id.vote_title);
+        vote_content1 = findViewById(R.id.vote_content1);
+        vote_content2 = findViewById(R.id.vote_content2);
+        vote_content3 = findViewById(R.id.vote_content3);
 
         vote_switch_plural = findViewById(R.id.vote_switch_plural);
         vote_switch_plural.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                if(isChecked)
+                    isPlural = true;
+                else
+                    isPlural = false;
             }
         });
 
@@ -49,7 +67,10 @@ public class VoteActivity extends AppCompatActivity {
         vote_switch_anonymity.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                if(isChecked)
+                    isAnonymity = true;
+                else
+                    isAnonymity = false;
             }
         });
 
@@ -57,7 +78,10 @@ public class VoteActivity extends AppCompatActivity {
         vote_switch_addition.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                
+                if(isChecked)
+                    isAvaliable = true;
+                else
+                    isAvaliable = false;
             }
         });
     }
@@ -71,6 +95,7 @@ public class VoteActivity extends AppCompatActivity {
         edit_content.setEms(15);
         edit_content.setHint("항목 입력");
         edit_content.setLayoutParams(layoutParams);
+        contents.add(edit_content.getText().toString());
         linearLayout.addView(edit_content);
     }
 
@@ -115,8 +140,23 @@ public class VoteActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_save_button :
+
+                contents.add(vote_content1.getText().toString());
+                contents.add(vote_content2.getText().toString());
+                contents.add(vote_content3.getText().toString());
+
+                Log.d("[Title]=>",vote_title.getText().toString());
+                Log.d("[Contents]=>",contents.toString());
+                Log.d("[Plural]=>",String.valueOf(isPlural));
+                Log.d("[Anonymity]=>",String.valueOf(isAnonymity));
+                Log.d("[Avaliable]=>",String.valueOf(isAvaliable));
+
                 Intent intent = new Intent(VoteActivity.this, WriteActivity.class);
                 intent.putExtra("VoteTitle",vote_title.getText().toString());
+                intent.putExtra("VoteContent",contents);
+                intent.putExtra("VotePlural",isPlural);
+                intent.putExtra("VoteAnonymity",isAnonymity);
+                intent.putExtra("VoteAvaliable",isAvaliable);
                 setResult(RESULT_OK,intent);
                 finish();
                 return true;

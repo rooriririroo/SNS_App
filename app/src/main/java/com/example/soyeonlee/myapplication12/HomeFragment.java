@@ -17,23 +17,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.felipecsl.asymmetricgridview.library.Utils;
+import com.felipecsl.asymmetricgridview.library.model.AsymmetricItem;
+import com.felipecsl.asymmetricgridview.library.widget.AsymmetricGridView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
-
-    UserInfoDBHelper user_helper;
-    ListDBHelper list_helper;
 
     ListView listView;
     ListItemAdapter adapter;
@@ -57,9 +64,6 @@ public class HomeFragment extends Fragment {
         listItemArrayList = new ArrayList<ListItem>();
         listView = (ListView) rootView.findViewById(R.id.listView);
         adapter = new ListItemAdapter(getContext(),listItemArrayList);
-
-        user_helper = new UserInfoDBHelper(getContext());
-        list_helper = new ListDBHelper(getContext());
 
         listView.setAdapter(adapter);
         //listItemArrayList.add(new ListItem());
@@ -139,7 +143,9 @@ public class HomeFragment extends Fragment {
                         String inputText = object.get("inputText").getAsString();
                         String inputImage = object.get("inputImage").getAsString();
                         String inputVideo = object.get("inputVideo").getAsString();
+
                         listItemArrayList.add(new ListItem(inputText,inputImage,inputVideo));
+
                     }
                     adapter.notifyDataSetChanged();
                 }

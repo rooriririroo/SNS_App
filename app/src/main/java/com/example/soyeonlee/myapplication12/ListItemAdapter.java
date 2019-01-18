@@ -1,13 +1,18 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -36,6 +41,8 @@ public class ListItemAdapter extends BaseAdapter {
         TextView comment_num;
         Button like_button;
         Button comment_button;
+        GridLayout gridLayout;
+        RelativeLayout relativeLayout;
     }
 
 
@@ -75,8 +82,8 @@ public class ListItemAdapter extends BaseAdapter {
             viewHolder.userName = (TextView) convertView.findViewById(R.id.userName);
             viewHolder.date = (TextView) convertView.findViewById(R.id.date);
             viewHolder.writing = (TextView) convertView.findViewById(R.id.writing);
-            viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
-            viewHolder.video = (VideoView) convertView.findViewById(R.id.video);
+            //viewHolder.image = (ImageView) convertView.findViewById(R.id.image);
+            //viewHolder.video = (VideoView) convertView.findViewById(R.id.video);
             //viewHolder.image2 = (ImageView) convertView.findViewById(R.id.image2);
             viewHolder.like = (TextView) convertView.findViewById(R.id.like);
             viewHolder.like_num = (TextView) convertView.findViewById(R.id.like_num);
@@ -84,6 +91,8 @@ public class ListItemAdapter extends BaseAdapter {
             viewHolder.comment_num = (TextView) convertView.findViewById(R.id.comment_num);
             viewHolder.like_button = (Button) convertView.findViewById(R.id.like_button);
             viewHolder.comment_button = (Button) convertView.findViewById(R.id.comment_button);
+            viewHolder.gridLayout = (GridLayout) convertView.findViewById(R.id.dynamic_grid);
+            viewHolder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.dynamic_relative);
             convertView.setTag(viewHolder);
         }
         else {
@@ -100,9 +109,106 @@ public class ListItemAdapter extends BaseAdapter {
         viewHolder.userName.setText(listItemArrayList.get(position).getUserName());
         //viewHolder.date.setText(listItemArrayList.get(position).getDate());
         viewHolder.writing.setText(listItemArrayList.get(position).getText());
-        Glide.with(context).load(listItemArrayList.get(position).getImage()).into(viewHolder.image);
-        viewHolder.video.setVideoPath(listItemArrayList.get(position).getVideo());
-        viewHolder.video.start();
+
+        GridLayout.Spec row1 = GridLayout.spec(0,1);
+        GridLayout.Spec col1 = GridLayout.spec(0,1);
+        GridLayout.Spec row2 = GridLayout.spec(0,1);
+        GridLayout.Spec col2 = GridLayout.spec(1,1);
+        GridLayout.LayoutParams layoutParams1 = new GridLayout.LayoutParams(row1,col1);
+        //layoutParams1.setGravity(Gravity.FILL_HORIZONTAL);
+        //GridLayout.LayoutParams layoutParams2 = new GridLayout.LayoutParams(row2,col2);
+        //layoutParams2.setGravity(Gravity.FILL_HORIZONTAL);
+
+        viewHolder.gridLayout.setBackgroundColor(Color.RED);
+        viewHolder.gridLayout.removeAllViews();
+
+        ImageView imageView = new ImageView(context);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Glide.with(context).load(listItemArrayList.get(position).getImage()).override(1080,600).into(imageView);
+        imageView.setLayoutParams(layoutParams1);
+        viewHolder.gridLayout.addView(imageView);
+
+        VideoView videoView = new VideoView(context);
+        videoView.setVideoPath(listItemArrayList.get(position).getVideo());
+        viewHolder.gridLayout.addView(videoView);
+
+        /* gridview 4*4
+        ImageView imageView1 = new ImageView(context);
+        imageView1.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView1.setLayoutParams(layoutParams1);
+        Glide.with(context).load(R.drawable.rush1).override(540,600).into(imageView1);
+        viewHolder.gridLayout.addView(imageView1);
+
+        ImageView imageView2 = new ImageView(context);
+        imageView2.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        //imageView2.setLayoutParams(layoutParams2);
+        Glide.with(context).load(R.drawable.rush2).override(540,600).into(imageView2);
+        viewHolder.gridLayout.addView(imageView2);
+
+        ImageView imageView3 = new ImageView(context);
+        imageView3.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView3.setLayoutParams(layoutParams2);
+        Glide.with(context).load(R.drawable.rush2).override(540,600).into(imageView3);
+        viewHolder.gridLayout.addView(imageView3);
+
+        ImageView imageView4 = new ImageView(context);
+        imageView4.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        //imageView2.setLayoutParams(layoutParams2);
+        Glide.with(context).load(R.drawable.rush1).override(540,600).into(imageView4);
+        viewHolder.gridLayout.addView(imageView4);*/
+
+
+
+        //relative layout
+        /*
+        RelativeLayout.LayoutParams imageLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,600);
+        imageLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+
+        ImageView imageView = new ImageView(context);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setId(R.id.dynamic_image1);
+        Glide.with(context).load(listItemArrayList.get(position).getImage()).into(imageView);
+        imageView.setLayoutParams(imageLayoutParams);
+        viewHolder.relativeLayout.addView(imageView);
+
+        RelativeLayout.LayoutParams imageLayoutParams2 = new RelativeLayout.LayoutParams(540,600);
+        //imageLayoutParams2.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        imageLayoutParams2.addRule(RelativeLayout.BELOW,R.id.dynamic_image1);
+
+        ImageView imageView2 = new ImageView(context);
+        imageView2.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView2.setId(R.id.dynamic_image2);
+        Glide.with(context).load(R.drawable.rush1).into(imageView2);
+        imageView2.setLayoutParams(imageLayoutParams2);
+        viewHolder.relativeLayout.addView(imageView2);
+
+        RelativeLayout.LayoutParams imageLayoutParams3 = new RelativeLayout.LayoutParams(540,600);
+        //imageLayoutParams3.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        imageLayoutParams3.addRule(RelativeLayout.BELOW,R.id.dynamic_image1);
+        imageLayoutParams3.addRule(RelativeLayout.END_OF,R.id.dynamic_image2);
+
+        ImageView imageView3 = new ImageView(context);
+        imageView3.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Glide.with(context).load(R.drawable.rush2).into(imageView3);
+        imageView3.setLayoutParams(imageLayoutParams3);
+        viewHolder.relativeLayout.addView(imageView3);*/
+
+        /*RelativeLayout.LayoutParams videoLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,600);
+        videoLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        //videoLayoutParams.addRule(RelativeLayout.BELOW,imageView.getId());
+        VideoView videoView = new VideoView(context);
+        videoView.setVideoPath(listItemArrayList.get(position).getVideo());
+        videoView.start();
+        videoView.setLayoutParams(videoLayoutParams);
+        viewHolder.relativeLayout.addView(videoView);*/
+
+        //viewHolder.gridLayout.removeAllViews();
+        //viewHolder.gridLayout.addView(listItemArrayList.get(position).getComment());
+        //viewHolder.gridLayout.addView(listItemArrayList.get(position).getImages());
+        //viewHolder.gridLayout.addView(listItemArrayList.add(new ListItem(images[],videos[])));
+        //Glide.with(context).load(listItemArrayList.get(position).getImage()).into(viewHolder.image);
+        //viewHolder.video.setVideoPath(listItemArrayList.get(position).getVideo());
+        //viewHolder.video.start();
         //Glide.with(context).load(listItemArrayList.get(position).getImage()).into(viewHolder.image2);
 
         return convertView;

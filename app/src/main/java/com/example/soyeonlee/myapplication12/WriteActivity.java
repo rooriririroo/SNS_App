@@ -76,7 +76,6 @@ public class WriteActivity extends AppCompatActivity {
     SQLiteDatabase db;
     ListDBHelper helper;
 
-    EditText main_edit;
     Button image_button;
     Button video_button;
     Button file_button;
@@ -90,9 +89,37 @@ public class WriteActivity extends AppCompatActivity {
     int REQUEST_VOTE = 1001;
     int REQUEST_MAP = 1002;
 
+    // 다른 액티비티로부터 받은 데이터 저장
     ArrayList<String> imagePath = new ArrayList<String>();
     ArrayList<String> videoPath = new ArrayList<String>();
     ArrayList<String> filePath = new ArrayList<String>();
+
+    // 서버로 보내기 위한 데이터 저장
+    ArrayList<String> textList = new ArrayList<String>();
+    ArrayList<String> imageList = new ArrayList<String>();
+    ArrayList<String> videoList = new ArrayList<String>();
+    ArrayList<String> mediaList = new ArrayList<String>();
+    ArrayList<String> fileList = new ArrayList<String>();
+    ArrayList<VoteItem> voteList = new ArrayList<VoteItem>();
+    ArrayList<MapItem> mapList = new ArrayList<MapItem>();
+
+    String[] texts;
+    String[] images;
+    String[] videos;
+    String[] medias;
+    String[] files;
+    String[] votes;
+    String[] maps;
+
+    EditText main_edit;
+    EditText textForImage;
+    EditText textForVideo;
+    EditText textForFile;
+    EditText textForVote;
+    EditText textForMap;
+
+    int imageCount = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +137,7 @@ public class WriteActivity extends AppCompatActivity {
         main_edit.setPadding(30,10,30,10);
         main_edit.setHint("글을 입력하세요.");
         main_edit.setBackgroundColor(Color.TRANSPARENT);
+        textList.add(main_edit.getText().toString());
         linearLayout.addView(main_edit,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT));
 
         image_button = (Button) findViewById(R.id.image_button);
@@ -187,14 +215,17 @@ public class WriteActivity extends AppCompatActivity {
         if(intent.hasExtra("images")) {
             imagePath = intent.getStringArrayListExtra("images");
             for(int i=0; i<imagePath.size(); i++) {
+                final int index = i;
                 final ImageView image = new ImageView(getApplicationContext());
                 image.setPadding(30,0,30,0);
                 image.setAdjustViewBounds(true);
                 //image.setColorFilter(88000000);
                 Glide.with(getApplicationContext()).load(imagePath.get(i)).into(image);
+                imageList.add(imagePath.get(i));
+                mediaList.add(imagePath.get(i));
                 linearLayout.addView(image);
 
-                final EditText textForImage = new EditText(getApplicationContext());
+                textForImage = new EditText(getApplicationContext());
                 textForImage.setPadding(30,0,30,0);
                 textForImage.setText("");
                 textForImage.setCursorVisible(false);
@@ -207,7 +238,12 @@ public class WriteActivity extends AppCompatActivity {
                         textForImage.requestFocus();
                     }
                 });
+                //images[imageCount] = textForFile.getText().toString();
+                //imageCount++;
+                //textList.add(textForImage.getText().toString());
                 linearLayout.addView(textForImage);
+
+                //
 
                 final CharSequence[] items = {"삭제"};
                 image.setOnClickListener(new View.OnClickListener() {
@@ -221,6 +257,8 @@ public class WriteActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 image.setVisibility(View.GONE);
                                 textForImage.setVisibility(View.GONE);
+                                imageList.remove(imagePath.get(index));
+                                mediaList.remove(imagePath.get(index));
                             }
                         });
                         builder.show();
@@ -233,13 +271,16 @@ public class WriteActivity extends AppCompatActivity {
         if(intent.hasExtra("videos")) {
             videoPath = intent.getStringArrayListExtra("videos");
             for(int i=0; i<videoPath.size(); i++) {
+                final int index = i;
                 final ImageView video = new ImageView(getApplicationContext());
                 video.setPadding(30,0,30,0);
                 video.setAdjustViewBounds(true);
                 Glide.with(getApplicationContext()).load(videoPath.get(i)).into(video);
+                videoList.add(videoPath.get(i));
+                mediaList.add(videoPath.get(i));
                 linearLayout.addView(video);
 
-                final EditText textForVideo = new EditText(getApplicationContext());
+                textForVideo = new EditText(getApplicationContext());
                 textForVideo.setPadding(30,0,30,0);
                 textForVideo.setText("");
                 textForVideo.setCursorVisible(false);
@@ -254,6 +295,8 @@ public class WriteActivity extends AppCompatActivity {
                 });
                 linearLayout.addView(textForVideo);
 
+                //textList.add(textForVideo.getText().toString());
+
                 final CharSequence[] items = {"삭제"};
                 video.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -266,6 +309,8 @@ public class WriteActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 video.setVisibility(View.GONE);
                                 textForVideo.setVisibility(View.GONE);
+                                videoList.remove(videoPath.get(index));
+                                mediaList.remove(videoPath.get(index));
                                 //Toast.makeText(getApplicationContext(),items[which],Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -307,6 +352,7 @@ public class WriteActivity extends AppCompatActivity {
                     filePath = data.getStringArrayListExtra("files");
 
                     for(int i=0; i<filePath.size(); i++) {
+                        final int index = i;
                         File stringToFile = new File(filePath.get(i));
 
                         final TextView file = new TextView(getApplicationContext());
@@ -326,9 +372,10 @@ public class WriteActivity extends AppCompatActivity {
                         file.setText(spannable);
                         file.setGravity(Gravity.CENTER_VERTICAL);
                         file.setPadding(30,50,30,50);
+                        fileList.add(filePath.get(i));
                         linearLayout.addView(file);
 
-                        final EditText textForFile = new EditText(getApplicationContext());
+                        textForFile = new EditText(getApplicationContext());
                         textForFile.setPadding(30,0,30,0);
                         textForFile.setText("");
                         textForFile.setCursorVisible(false);
@@ -343,6 +390,8 @@ public class WriteActivity extends AppCompatActivity {
                         });
                         linearLayout.addView(textForFile);
 
+                        //textList.add(textForFile.getText().toString());
+
                         final CharSequence[] items = {"삭제"};
                         file.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -355,6 +404,7 @@ public class WriteActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int which) {
                                         file.setVisibility(View.GONE);
                                         textForFile.setVisibility(View.GONE);
+                                        fileList.remove(filePath.get(index));
                                         //Toast.makeText(getApplicationContext(),items[which],Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -374,8 +424,12 @@ public class WriteActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(30,0,30,0);
 
-                String title = "투표";
-                String text = title + "\n" + data.getStringExtra("VoteTitle");
+                final String title = "투표";
+                final String text = title + "\n" + data.getStringExtra("VoteTitle");
+                final ArrayList<String> contents = data.getStringArrayListExtra("VoteContent");
+                final boolean isplural = data.getBooleanExtra("VotePlural",false);
+                final boolean isAnonymity = data.getBooleanExtra("VoteAnonymity",false);
+                final boolean isAvaliable = data.getBooleanExtra("VoteAvaliable",false);
 
                 SpannableString spannable = new SpannableString(text);
                 spannable.setSpan(new ForegroundColorSpan(Color.rgb(255,180,113)),0,2,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -388,10 +442,10 @@ public class WriteActivity extends AppCompatActivity {
                 vote.setCompoundDrawablePadding(30);
                 vote.setCompoundDrawableTintList(ColorStateList.valueOf(Color.rgb(255,180,113)));
                 vote.setPadding(30,50,30,50);
-
+                voteList.add(new VoteItem(text,contents,isplural,isAnonymity,isAvaliable));
                 linearLayout.addView(vote);
 
-                final EditText textForVote = new EditText(getApplicationContext());
+                textForVote = new EditText(getApplicationContext());
                 textForVote.setPadding(30,0,30,0);
                 textForVote.setText("");
                 textForVote.setCursorVisible(false);
@@ -404,6 +458,8 @@ public class WriteActivity extends AppCompatActivity {
                         textForVote.requestFocus();
                     }
                 });
+
+                //textList.add(textForVote.getText().toString());
 
                 linearLayout.addView(textForVote);
                 final CharSequence[] items = {"삭제"};
@@ -418,6 +474,8 @@ public class WriteActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 vote.setVisibility(View.GONE);
                                 textForVote.setVisibility(View.GONE);
+                                voteList.clear();
+                                //voteList.remove(new VoteItem(text,contents,isplural,isAnonymity,isAvaliable));
                                 //Toast.makeText(getApplicationContext(),items[which],Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -429,6 +487,7 @@ public class WriteActivity extends AppCompatActivity {
         if(requestCode == REQUEST_MAP) {
             if(resultCode == RESULT_OK) {
 
+                final Intent intent = data;
                 String address = data.getStringExtra("Address");
 
                 final TextView map = new TextView(getApplicationContext());
@@ -451,10 +510,10 @@ public class WriteActivity extends AppCompatActivity {
                 map.setCompoundDrawablePadding(30);
                 map.setCompoundDrawableTintList(ColorStateList.valueOf(Color.rgb(249,83,83)));
                 map.setPadding(30,60,30,60);
-
+                mapList.add(new MapItem(data.getStringExtra("Name"),data.getStringExtra("Address")));
                 linearLayout.addView(map);
 
-                final EditText textForMap = new EditText(getApplicationContext());
+                textForMap = new EditText(getApplicationContext());
                 textForMap.setPadding(30,0,30,0);
                 textForMap.setText("");
                 textForMap.setCursorVisible(false);
@@ -467,6 +526,9 @@ public class WriteActivity extends AppCompatActivity {
                         textForMap.requestFocus();
                     }
                 });
+
+
+                //textList.add(textForMap.getText().toString());
 
                 linearLayout.addView(textForMap);
                 final CharSequence[] items = {"삭제"};
@@ -481,6 +543,7 @@ public class WriteActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 map.setVisibility(View.GONE);
                                 textForMap.setVisibility(View.GONE);
+                                mapList.clear();
                                 //Toast.makeText(getApplicationContext(),items[which],Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -543,6 +606,86 @@ public class WriteActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_save_button :
 
+                String inputText = main_edit.getText().toString();
+                String inputImageCount = String.valueOf(imageList.size());
+                String inputVideoCount = String.valueOf(videoList.size());
+                String inputMediaCount = String.valueOf(mediaList.size());
+                String inputFileCount = String.valueOf(fileList.size());
+                String inputVoteCount = "vote_test";
+                String inputMapCount = "map_test";
+
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try{
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+
+                            if(success) {
+                                Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(WriteActivity.this,MainActivity.class);
+                                startActivity(intent);
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(),"가입실패",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                WriteRequest writeRequest = new WriteRequest(inputText, inputImageCount, inputVideoCount, inputMediaCount,
+                        inputFileCount, inputVoteCount, inputMapCount, responseListener);
+                RequestQueue queue = Volley.newRequestQueue(WriteActivity.this);
+                queue.add(writeRequest);
+
+                //image
+                Response.Listener<String> responseListener2 = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try{
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+
+                            if(success) {
+                                Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(WriteActivity.this,MainActivity.class);
+                                startActivity(intent);
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(),"가입실패",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                //ImageRequest imageRequest = new ImageRequest(inputImage, responseListener2);
+                //RequestQueue queue2 = Volley.newRequestQueue(WriteActivity.this);
+                //queue2.add(imageRequest);
+
+
+                //
+                Toast.makeText(getApplicationContext(),"success",Toast.LENGTH_SHORT).show();
+                Log.d("[Text]=>",main_edit.getText().toString());
+                Log.d("[Image]=>",imageList.toString());
+                Log.d("[Video]=>",videoList.toString());
+                Log.d("[Media]=>",mediaList.toString());
+                Log.d("[File]=>",fileList.toString());
+                if(voteList.size()>0)
+                    Log.d("[Vote]=>",voteList.get(0).getVoteTitle() + voteList.get(0).getVoteContent() + voteList.get(0).isPlural() + voteList.get(0).isAnonymity() + voteList.get(0).isAvaliable());
+                if(mapList.size()>0)
+                    Log.d("[Map]=>",mapList.get(0).getMapName() + mapList.get(0).getMapAddress());
+
+               /* for(int i=0; i<imageCount; i++) {
+                    Toast.makeText(getApplicationContext(),images[i],Toast.LENGTH_SHORT).show();
+                }*/
+
+                /*
                 final String inputText = main_edit.getText().toString();
                 final String inputImage = imagePath.get(0);
                 final String inputVideo = videoPath.get(0);
@@ -571,7 +714,7 @@ public class WriteActivity extends AppCompatActivity {
 
                 WriteRequest writeRequest = new WriteRequest(inputText, inputImage, inputVideo,responseListener);
                 RequestQueue queue = Volley.newRequestQueue(WriteActivity.this);
-                queue.add(writeRequest);
+                queue.add(writeRequest);*/
 
                 /*
                 Intent intent = getIntent();

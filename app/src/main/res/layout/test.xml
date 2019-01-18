@@ -5,30 +5,63 @@
 
     <GridLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="3">
+        android:layout_height="300dp"
+        android:orientation="vertical"
+        android:columnCount="2">
+
+        <View
+            android:layout_width="180dp"
+            android:layout_height="150dp"
+            />
+
+        <!--ImageView
+            android:layout_width="180dp"
+            android:scaleType="centerCrop"
+            android:layout_height="150dp"
+            android:src="@drawable/rush1"/>
+        <ImageView
+            android:layout_width="180dp"
+            android:scaleType="centerCrop"
+            android:layout_height="150dp"
+            android:src="@drawable/rush2"/>
 
         <ImageView
+            android:scaleType="fitXY"
+            android:src="@drawable/ir"
+            android:layout_row="0"
+            android:layout_column="1"/>
+        <ImageView
+            android:scaleType="fitXY"
+            android:src="@drawable/mh" /!-->
+
+
+    </GridLayout>
+
+    <!--RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+        <ImageView
+            android:id="@+id/ir"
             android:layout_width="match_parent"
             android:scaleType="centerCrop"
-            android:layout_columnSpan="3"
             android:layout_height="150dp"
             android:src="@drawable/rush1"/>
 
         <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:id="@+id/rush1"
+            android:layout_width="180dp"
+            android:layout_height="150dp"
+            android:layout_below="@+id/ir"
+            android:scaleType="fitXY"
             android:src="@drawable/ir" />
 
         <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/mh" />
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/pk"/>
-
-    </GridLayout>
+            android:layout_width="180dp"
+            android:layout_height="150dp"
+            android:layout_below="@+id/ir"
+            android:layout_toEndOf="@+id/rush1"
+            android:scaleType="fitXY"
+            android:src="@drawable/rush2" />
+    </RelativeLayout!-->
 
 </RelativeLayout>

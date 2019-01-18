@@ -50,8 +50,23 @@
         android:text="피카츄 라이츄 파이리 꼬부기"/>
 
 
+    <GridLayout
+        android:id="@+id/dynamic_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:columnCount="2">
 
-    <LinearLayout
+    </GridLayout>
+
+    <RelativeLayout
+        android:id="@+id/dynamic_relative"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </RelativeLayout>
+
+    <!--LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -69,7 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="180dp"
             android:layout_weight="1" />
-    </LinearLayout>
+    </LinearLayout!-->
 
     <LinearLayout
         android:layout_width="match_parent"

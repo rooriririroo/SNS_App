@@ -1,6 +1,7 @@
 package com.example.soyeonlee.myapplication12;
 
 import android.widget.Button;
+import android.widget.GridLayout;
 
 public class ListItem {
 
@@ -12,6 +13,19 @@ public class ListItem {
     private String video;
     private Button like;
     private Button comment;
+    private String[] images;
+    private String[] videos;
+    private GridLayout gridLayout;
+
+    public ListItem(String text, GridLayout gridLayout) {
+        this.text = text;
+        this.gridLayout = gridLayout;
+    }
+
+    public ListItem(String[] images, String[] videos) {
+        this.images = images;
+        this.videos = videos;
+    }
 
     public ListItem(String userImage, String userName, String date, String text, String image) {
         this.userImage = userImage;
@@ -27,9 +41,8 @@ public class ListItem {
         this.video = video;
     }
 
-    public ListItem(String userImage, String userName) {
-        this.userImage = userImage;
-        this.userName = userName;
+    public ListItem(String text) {
+        this.text = text;
     }
 
     public String getUserImage() {
@@ -95,5 +108,21 @@ public class ListItem {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String[] getImages() {
+        return images;
+    }
+
+    public void setImages(String[] images) {
+        this.images = images;
+    }
+
+    public String[] getVideos() {
+        return videos;
+    }
+
+    public void setVideos(String[] videos) {
+        this.videos = videos;
     }
 }
