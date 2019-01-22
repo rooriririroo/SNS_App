@@ -1,6 +1,9 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -46,9 +49,11 @@ public class MyInfoFragment extends Fragment {
     TextView myinfo_nickname;
     TextView myinfo_birth;
     TextView myinfo_phone;
+
     String userID;
 
-    RequestQueue requestQueue;
+    Context context = getActivity();
+    SharedPreferences loginUserInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,26 +66,10 @@ public class MyInfoFragment extends Fragment {
 
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_myinfo,container,false);
 
+        loginUserInfo = getActivity().getSharedPreferences("loginUserInfo",Context.MODE_PRIVATE);
+
         myinfo_image = rootView.findViewById(R.id.myinfo_image);
-
-        //myinfo_image.setImageURI(Uri.parse("/storage/emulated/0/Foodie/2019-01-02-14-03-23.jpg"));
-        //myinfo_image.setImageResource(R.drawable.back);
-        //myinfo_image.setImageURI(Uri.parse("content://media/external/images/media/19243"));
-        //Glide.with(getContext()).load(Uri.parse("content://media/external/images/media/19243")).into(myinfo_image);
-        myinfo_name = rootView.findViewById(R.id.myinfo_name);
-        myinfo_nickname = rootView.findViewById(R.id.myinfo_nickname);
-        myinfo_birth = rootView.findViewById(R.id.myinfo_birth);
-        myinfo_phone = rootView.findViewById(R.id.myinfo_phone);
-
-        if(requestQueue == null)
-            requestQueue = Volley.newRequestQueue(getContext());
-
-        Bundle bundle = getArguments();
-        if(bundle != null) {
-            userID = bundle.getString("userID");
-            //myinfo_nickname.setText(userID);
-        }
-
+        Glide.with(getActivity()).load(loginUserInfo.getString("userImage",null)).into(myinfo_image);
         myinfo_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,99 +77,24 @@ public class MyInfoFragment extends Fragment {
             }
         });
 
-        Response.Listener<String> responseListener = new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try{
-                    JsonParser parser = new JsonParser();
-                    JsonObject jsonResponse = (JsonObject) parser.parse(response);
-                    JsonArray array = (JsonArray) jsonResponse.get("response");
-                    for(int i = 0; i<array.size(); i++) {
-                        JsonObject object = (JsonObject) array.get(i);
+        myinfo_name = rootView.findViewById(R.id.myinfo_name);
+        myinfo_name.setText(loginUserInfo.getString("userName",null));
 
-                        if(userID.equals(object.get("userID").getAsString())) {
-                            /*
-                            String userImage = object.get("userImage").getAsString().trim();
-                            InputStream in = getActivity().getContentResolver().openInputStream(Uri.parse(userImage));
-                            Bitmap img = BitmapFactory.decodeStream(in);
-                            in.close();
-                            myinfo_image.setImageBitmap(img);*/
-                            //myinfo_image.setImageURI(Uri.parse("file:///storage/emulated/0/Foodie/2019-01-02-14-03-23.jpg"));
-                            //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(),Uri.parse(userImage));
-                            //myinfo_image.setImageBitmap(bitmap);
-                            //Glide.with(getContext()).load("file:///storage/emulated/0/Foodie/2019-01-02-14-03-23.jpg").into(myinfo_image);
-                            //Glide.with(getContext()).load(bitmap).into(myinfo_image);
-                            //Glide.with(getContext()).load(Uri.parse(userImage)).into(myinfo_image);
+        myinfo_nickname = rootView.findViewById(R.id.myinfo_nickname);
+        myinfo_nickname.setText(loginUserInfo.getString("userNickname",null));
 
-                            String userImage = object.get("userImage").getAsString();
-                            Glide.with(getContext()).load(userImage).into(myinfo_image);
-                            String userName = object.get("userName").getAsString();
-                            myinfo_name.setText(userName);
-                            String userNickname = object.get("userNickname").getAsString();
-                            myinfo_nickname.setText(userNickname);
-                            String userBirth = object.get("userBirth").getAsString();
-                            myinfo_birth.setText(userBirth);
-                            String userPhone = object.get("userPhone").getAsString();
-                            myinfo_phone.setText(userPhone);
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        myinfo_birth = rootView.findViewById(R.id.myinfo_birth);
+        myinfo_birth.setText(loginUserInfo.getString("userBirth",null));
 
-        LoadRequest loadRequest = new LoadRequest(userID, responseListener);
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-        queue.add(loadRequest);
+        myinfo_phone = rootView.findViewById(R.id.myinfo_phone);
+        myinfo_phone.setText(loginUserInfo.getString("userPhone",null));
 
-        //new LoadingTask().execute(userID);
+        Bundle bundle = getArguments();
+        if(bundle != null) {
+            userID = bundle.getString("userID");
+            //myinfo_nickname.setText(userID);
+        }
 
         return rootView;
-    }
-
-    class LoadingTask extends AsyncTask<String, Void, String> {
-
-        //String target;
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected String doInBackground(String... voids) {
-            try {
-
-                String target = "http://172.30.1.7:8888/android_login_api/load.php?userID="+userID;
-                URL url = new URL(target);
-
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-
-                InputStream inputStream = httpURLConnection.getInputStream();
-
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                String temp;
-
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while((temp = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(temp + "\n");
-                }
-
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-                return stringBuilder.toString().trim();
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            myinfo_name.setText(result);
-        }
     }
 }

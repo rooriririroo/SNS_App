@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -140,11 +141,29 @@ public class HomeFragment extends Fragment {
                     for(int i = 0; i<array.size(); i++) {
                         JsonObject object = (JsonObject) array.get(i);
 
+                        String inputDate = object.get("inputDate").getAsString();
+                        String userImage = object.get("userImage").getAsString();
+                        String userName = object.get("userName").getAsString();
                         String inputText = object.get("inputText").getAsString();
-                        String inputImage = object.get("inputImage").getAsString();
-                        String inputVideo = object.get("inputVideo").getAsString();
+                        String inputMedia = object.get("inputMedia").getAsString();
+                        String[] mediaArray = inputMedia.split(",");
+                        for(int j = 0; j<mediaArray.length; j++) {
+                            mediaArray[j] = mediaArray[j].trim();
+                            if(j==0) {
+                                mediaArray[j] = mediaArray[j].substring(1,mediaArray[j].length());
+                            }
+                            if(j==(mediaArray.length-1)) {
+                                mediaArray[j] = mediaArray[j].substring(0,mediaArray[j].length()-1);
+                            }
+                            //Log.d("[Split]=>","mediaArray[" + String.valueOf(i) + "] = "+ mediaArray[i]);
+                        }
 
-                        listItemArrayList.add(new ListItem(inputText,inputImage,inputVideo));
+
+                        String inputFile = object.get("inputFile").getAsString();
+                        String inputVote = object.get("inputVote").getAsString();
+                        String inputMap = object.get("inputMap").getAsString();
+
+                        listItemArrayList.add(new ListItem(inputDate,userImage,userName,inputText,mediaArray,inputFile,inputVote,inputMap));
 
                     }
                     adapter.notifyDataSetChanged();

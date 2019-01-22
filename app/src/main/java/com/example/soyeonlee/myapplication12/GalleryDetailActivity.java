@@ -2,6 +2,7 @@ package com.example.soyeonlee.myapplication12;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
@@ -29,8 +30,8 @@ public class GalleryDetailActivity extends AppCompatActivity {
     ViewPager viewPager;
     Intent intent;
     ArrayList<String> imageSliderList;
-
     ArrayList<String> arrPath;
+    ArrayList<String> uri;
     int p;
 
     @Override
@@ -47,6 +48,8 @@ public class GalleryDetailActivity extends AppCompatActivity {
         imageSliderList = intent.getStringArrayListExtra("AllFiles");
         p = Integer.valueOf(intent.getStringExtra("filePosition"));
         arrPath = intent.getStringArrayListExtra("images");
+        //uri = intent.getStringArrayListExtra("uris");
+
 
         viewPager = findViewById(R.id.image_slider);
         adapter = new ImageSlideAdapter(this,imageSliderList);
@@ -64,6 +67,10 @@ public class GalleryDetailActivity extends AppCompatActivity {
     public void attachClick(View v) {
         Intent intent = new Intent(GalleryDetailActivity.this,WriteActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        /*if(uri.size() == 0)
+            uri.add(imageSliderList.get(p));
+        intent.putExtra("images",uri);*/
         if(arrPath.size() == 0)
             arrPath.add(imageSliderList.get(p));
         intent.putExtra("images",arrPath);

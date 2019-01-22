@@ -46,9 +46,16 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String userID = intent.getStringExtra("userID");
+        String userName = intent.getStringExtra("userName");
+        String userBirth = intent.getStringExtra("userBirth");
+        String userPhone = intent.getStringExtra("userPhone");
+        String userNickname = intent.getStringExtra("userNickname");
+        String userImage = intent.getStringExtra("userImage");
+        String userDate = intent.getStringExtra("userDate");
 
         Bundle bundle = new Bundle();
         bundle.putString("userID",userID);
+        bundle.putString("userName",userName);
         //arrFragments[2].setArguments(bundle);
         arrFragments[3].setArguments(bundle);
     }

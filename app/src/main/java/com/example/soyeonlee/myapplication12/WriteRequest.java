@@ -8,18 +8,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WriteRequest extends StringRequest {
-    final static private String URL = "http://192.168.0.4:8888/send_data.php";
+    final static private String URL = IPAddress.IPAddress + "/send.php";
     private Map<String, String> parameters;
 
-    public WriteRequest(String inputText, String inputImage, String inputVideo,
+    public WriteRequest(String inputDate, String userImage, String userName, String inputText,
                         String inputMedia, String inputFile, String inputVote, String inputMap, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
 
         parameters = new HashMap<>();
 
+        parameters.put("inputDate",inputDate);
+        parameters.put("userImage",userImage);
+        parameters.put("userName",userName);
         parameters.put("inputText", inputText);
-        parameters.put("inputImage", inputImage);
-        parameters.put("inputVideo", inputVideo);
         parameters.put("inputMedia", inputMedia);
         parameters.put("inputFile", inputFile);
         parameters.put("inputVote", inputVote);

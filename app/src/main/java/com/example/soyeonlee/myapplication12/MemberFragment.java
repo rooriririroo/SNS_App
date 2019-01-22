@@ -85,17 +85,7 @@ public class MemberFragment extends Fragment {
                         String userDate = object.get("userDate").getAsString();
                         String userBirth = object.get("userBirth").getAsString();
 
-                        //memberListItemArrayList.add(new MemberListItem(userImage,userName,userNickname,userPhone));
                         memberListItemArrayList.add(new MemberListItem(userDate,userImage,userName,userNickname,userBirth,userPhone));
-                        //onMemberDataListener.onMemberDataSet(userDate,userImage,userName,userNickname,userBirth,userPhone);
-                        /*
-                        Intent intent = new Intent(getContext(),MemberDetailActivity.class);
-                        intent.putExtra("userName",userName);
-                        intent.putExtra("userPhone",userPhone);
-                        intent.putExtra("userNickname",userNickname);
-                        intent.putExtra("userImage",userImage);
-                        intent.putExtra("userDate",userDate);
-                        startActivity(intent);*/
                     }
                     adapter.notifyDataSetChanged();
                 }

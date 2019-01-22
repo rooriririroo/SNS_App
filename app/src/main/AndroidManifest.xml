@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -58,7 +59,8 @@
         <activity android:name=".VideoGridActivity" />
         <activity android:name=".CaptureImageActivity" />
         <activity android:name=".CaptureVideoActivity" />
-        <activity android:name=".FileActivity"></activity>
+        <activity android:name=".FileActivity" />
+        <activity android:name=".ProfileChangeActivity"></activity>
     </application>
 
 </manifest>

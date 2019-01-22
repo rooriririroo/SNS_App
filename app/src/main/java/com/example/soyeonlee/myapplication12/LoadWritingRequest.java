@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoadWritingRequest extends StringRequest {
-    final static private String URL = "http://192.168.0.4:8888/loadWriting.php";
+    final static private String URL = IPAddress.IPAddress + "/get.php";
     private Map<String, String> parameters;
 
     public LoadWritingRequest(Response.Listener<String> listener) {

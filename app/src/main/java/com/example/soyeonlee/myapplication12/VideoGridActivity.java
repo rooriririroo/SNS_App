@@ -1,8 +1,11 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -36,6 +39,7 @@ public class VideoGridActivity extends AppCompatActivity {
     int total = 0;
     TextView badgeNum;
     ArrayList<String> arrPath;
+    ArrayList<String> uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,7 @@ public class VideoGridActivity extends AppCompatActivity {
         adapter = new VideoGridItemAdapter(this,gridItemArrayList);
         gridView.setAdapter(adapter);
         arrPath = new ArrayList<String>();
+        uri = new ArrayList<String>();
 
         Intent intent = getIntent();
         String path = intent.getStringExtra("folderPath");
@@ -70,6 +75,7 @@ public class VideoGridActivity extends AppCompatActivity {
 
         for(File file : files) {
             if(file.getName().endsWith(".mp4")) {
+                //gridItemArrayList.add(new GridItem(getUriFromPath(file.getAbsolutePath()).toString()));
                 gridItemArrayList.add(new GridItem(file.getAbsolutePath()));
                 count++;
             }
@@ -94,6 +100,7 @@ public class VideoGridActivity extends AppCompatActivity {
                 Intent intent = new Intent(VideoGridActivity.this,WriteActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("videos",arrPath);
+                //intent.putExtra("videos",uri);
                 //setResult(RESULT_FROM_GRID,intent);
                 startActivity(intent);
             }
@@ -185,6 +192,7 @@ public class VideoGridActivity extends AppCompatActivity {
                         cb.setChecked(false);
                         selection[id] = false;
                         total--;
+                        //uri.remove(gridItemArrayList.get(id).getGridImage());
                         arrPath.remove(gridItemArrayList.get(id).getGridImage());
 
                         if(total == 0)
@@ -197,6 +205,7 @@ public class VideoGridActivity extends AppCompatActivity {
                         selection[id] = true;
                         total++;
                         arrPath.add(gridItemArrayList.get(id).getGridImage());
+                        //uri.add(gridItemArrayList.get(id).getGridImage());
 
                         if(total == 1)
                             badgeNum.setVisibility(View.VISIBLE);
@@ -211,5 +220,13 @@ public class VideoGridActivity extends AppCompatActivity {
 
             return convertView;
         }
+    }
+
+    public Uri getUriFromPath(String filePath) {
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,null,"_data = '"+filePath+"'",null,null);
+        cursor.moveToNext();
+        int id = cursor.getInt(cursor.getColumnIndex("_id"));
+        Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,id);
+        return uri;
     }
 }

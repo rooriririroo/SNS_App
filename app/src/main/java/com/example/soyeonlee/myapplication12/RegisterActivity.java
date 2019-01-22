@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,12 +20,18 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONObject;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Enumeration;
 
@@ -48,8 +55,15 @@ public class RegisterActivity extends AppCompatActivity {
     ImageView register_image;
 
     Uri uri;
+    String uriToPath;
     boolean validate = false;
     boolean album_open = false;
+
+    int REQUEST_IMAGE = 1000;
+
+    String uploadServerPath = null;
+    String uploadServerUri = null;
+    int serverResponseCode = 0;
 
 
     @Override
@@ -59,6 +73,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
+
+        uploadServerUri = IPAddress.IPAddress + "/user_profile.php";
+        uploadServerPath = IPAddress.IPAddress + "/userProfile/";
 
         register_name = findViewById(R.id.register_name);
         register_id = findViewById(R.id.register_id);
@@ -101,7 +118,8 @@ public class RegisterActivity extends AppCompatActivity {
                 + register_birth3.getText().toString() + "일";
         String userNickname = register_nickname.getText().toString();
         //String userImage = uri.toString();
-        String userImage = getRealPath(uri);
+        File filePath = new File(getRealPath(uri));
+        String userImage = uploadServerPath + filePath.getName();
         String userDate = String.format("%d년 %02d월 %02d일",year,month+1,day);
 
         if(!validate) {
@@ -123,6 +141,16 @@ public class RegisterActivity extends AppCompatActivity {
             builder.show();
             return;
         }
+
+        new Thread(new Runnable() {
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                    }
+                });
+                uploadFile(getRealPath(uri));
+            }
+        }).start();
 
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
@@ -210,17 +238,16 @@ public class RegisterActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,1);
+        startActivityForResult(intent,REQUEST_IMAGE);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1) {
-
+        if(requestCode == REQUEST_IMAGE) {
             if(resultCode == RESULT_OK) {
-
                 try {
                     uri = data.getData();
-                    register_image.setImageURI(uri);
+                    uriToPath = getRealPath(uri);
+                    Glide.with(getApplicationContext()).load(uri).into(register_image);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -236,5 +263,101 @@ public class RegisterActivity extends AppCompatActivity {
         Uri uri = Uri.fromFile(new File(path));
         cursor.close();
         return path;
+    }
+
+    public int uploadFile(String sourceFileUri) {
+
+        HttpURLConnection conn = null;
+        DataOutputStream dos = null;
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        String boundary = "*****";
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1 * 1024 * 1024;
+        File sourceFile = new File(sourceFileUri);
+
+        if (!sourceFile.isFile()) {
+            Log.e("uploadFile","Soure File not exist");
+            runOnUiThread(new Runnable() {
+                public void run() {
+
+                }
+            });
+            return 0;
+        }
+
+        else {
+            try {
+                // open a URL connection to the Servlet
+                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+                URL url = new URL(uploadServerUri);
+
+                // Open a HTTP  connection to  the URL
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput(true); // Allow Inputs
+                conn.setDoOutput(true); // Allow Outputs
+                conn.setUseCaches(false); // Don't use a Cached Copy
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                conn.setRequestProperty("uploaded_file", sourceFileUri);
+
+                dos = new DataOutputStream(conn.getOutputStream());
+                dos.writeBytes(twoHyphens + boundary + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                        + sourceFileUri + "\"" + lineEnd);
+                dos.writeBytes(lineEnd);
+
+                // create a buffer of  maximum size
+                bytesAvailable = fileInputStream.available();
+
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+
+                // read file and write it into form...
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                while (bytesRead > 0) {
+                    dos.write(buffer, 0, bufferSize);
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                }
+
+                // send multipart form data necesssary after file data...
+                dos.writeBytes(lineEnd);
+                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                // Responses from the server (code and message)
+                serverResponseCode = conn.getResponseCode();
+                String serverResponseMessage = conn.getResponseMessage();
+
+                Log.i("uploadFile ", "HTTP Response is : " + serverResponseMessage + ": " + serverResponseCode);
+
+                if (serverResponseCode == 200) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(RegisterActivity.this, "File Upload Complete.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                //close the streams //
+                fileInputStream.close();
+                dos.flush();
+                dos.close();
+
+            } catch (MalformedURLException ex) {
+                ex.printStackTrace();
+                Log.e("Upload file to server ", "Error: " + ex.getMessage(), ex);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("Upload file to server ", "Exception: " + e.getMessage(), e);
+            }
+            return serverResponseCode;
+        } // End else block
     }
 }

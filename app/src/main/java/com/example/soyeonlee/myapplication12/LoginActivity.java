@@ -22,6 +22,9 @@ import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.nhn.android.naverlogin.OAuthLoginHandler;
 import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
@@ -38,11 +41,18 @@ public class LoginActivity extends AppCompatActivity {
     String getDeviceID;
     String userID;
     String userPassword;
+    String userName;
+    String userBirth;
+    String userPhone;
+    String userNickname;
+    String userImage;
+    String userDate;
     EditText login_id;
     EditText login_pw;
     CheckBox login_check;
     boolean loginChecked;
-    public SharedPreferences settings;
+    public SharedPreferences loginUserInfo;
+    //LoginUserInfo loginUserInfo = new LoginUserInfo();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +69,14 @@ public class LoginActivity extends AppCompatActivity {
         login_pw = findViewById(R.id.login_pw);
         login_check = findViewById(R.id.login_check);
 
-        settings = getSharedPreferences("settings", Activity.MODE_PRIVATE);
-        loginChecked = settings.getBoolean("LoginChecked",false);
+        loginUserInfo = getSharedPreferences("loginUserInfo", Activity.MODE_PRIVATE);
+        loginChecked = loginUserInfo.getBoolean("LoginChecked",false);
         if(loginChecked) {
-            login_id.setText(settings.getString("loginID",""));
-            login_pw.setText(settings.getString("loginPW",""));
+            login_id.setText(loginUserInfo.getString("loginID",""));
+            login_pw.setText(loginUserInfo.getString("loginPW",""));
             login_check.setChecked(true);
         }
-        if(!settings.getString("loginID","").equals(""))
+        if(!loginUserInfo.getString("loginID","").equals(""))
             login_pw.requestFocus();
 
     }
@@ -89,20 +99,39 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 try{
-                    JSONObject jsonResponse = new JSONObject(response);
-                    boolean success = jsonResponse.getBoolean("success");
-                    if(success) {
-                        //Toast.makeText(getApplicationContext(),jsonResponse.getString("userID"),Toast.LENGTH_SHORT).show();
-                        String userID = jsonResponse.getString("userID");
-                        //String userPassword = jsonResponse.getString("userPassword");
-                        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-                        intent.putExtra("userID", userID);
-                        //intent.putExtra("userPassword", userPassword);
-                        LoginActivity.this.startActivity(intent);
-                        finish();
-                    }
-                    else {
+                    JsonParser parser = new JsonParser();
+                    JsonObject jsonResponse = (JsonObject) parser.parse(response);
+                    JsonArray array = (JsonArray) jsonResponse.get("response");
+                    if(array.size()==0)
                         Toast.makeText(getApplicationContext(),"로그인에 실패했습니다.",Toast.LENGTH_SHORT).show();
+                    else {
+                        for(int i = 0; i<array.size(); i++) {
+                            JsonObject object = (JsonObject) array.get(i);
+
+                            userID = object.get("userID").getAsString();
+                            userPassword = object.get("userPassword").getAsString();
+                            userName = object.get("userName").getAsString();
+                            userPhone = object.get("userPhone").getAsString();
+                            userNickname = object.get("userNickname").getAsString();
+                            userImage = object.get("userImage").getAsString();
+                            userDate = object.get("userDate").getAsString();
+                            userBirth = object.get("userBirth").getAsString();
+
+                            //saveUser(userID, userPassword, userName, userBirth, userPhone, userNickname,
+                                   // userImage, userDate);
+                            Toast.makeText(getApplicationContext(),userName + "님 환영합니다.", Toast.LENGTH_SHORT).show();
+
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("userID",userID);
+                            intent.putExtra("userPassword",userPassword);
+                            intent.putExtra("userName",userName);
+                            intent.putExtra("userBirth",userBirth);
+                            intent.putExtra("userPhone",userPhone);
+                            intent.putExtra("userNickname",userNickname);
+                            intent.putExtra("userImage",userImage);
+                            intent.putExtra("userDate",userDate);
+                            startActivity(intent);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -123,18 +152,37 @@ public class LoginActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         if(login_check.isChecked()) {
-            settings = getSharedPreferences("settings",Activity.MODE_PRIVATE);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("loginID",userID);
-            editor.putString("loginPW",userPassword);
+            loginUserInfo = getSharedPreferences("loginUserInfo",Activity.MODE_PRIVATE);
+            SharedPreferences.Editor editor = loginUserInfo.edit();
+            editor.putString("userID",userID);
+            editor.putString("userPassword",userPassword);
+            editor.putString("userName",userName);
+            editor.putString("userBirth",userBirth);
+            editor.putString("userPhone",userPhone);
+            editor.putString("userNickname",userNickname);
+            editor.putString("userImage",userImage);
+            editor.putString("userDate",userDate);
             editor.putBoolean("LoginChecked",true);
             editor.commit();
         }
         else {
-            settings = getSharedPreferences("settings",Activity.MODE_PRIVATE);
-            SharedPreferences.Editor editor = settings.edit();
+            loginUserInfo = getSharedPreferences("settings",Activity.MODE_PRIVATE);
+            SharedPreferences.Editor editor = loginUserInfo.edit();
             editor.clear();
             editor.commit();
         }
     }
+
+    /*
+    public void saveUser(String userID, String userPassword, String userName, String userBirth, String userPhone,
+                         String userNickname, String userImage, String userDate) {
+        loginUserInfo.setUserID(userID);
+        loginUserInfo.setUserPassword(userPassword);
+        loginUserInfo.setUserName(userName);
+        loginUserInfo.setUserBirth(userBirth);
+        loginUserInfo.setUserPhone(userPhone);
+        loginUserInfo.setUserNickname(userNickname);
+        loginUserInfo.setUserImage(userImage);
+        loginUserInfo.setUserDate(userDate);
+    }*/
 }

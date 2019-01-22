@@ -36,6 +36,8 @@ public class VoteActivity extends AppCompatActivity {
     boolean isAnonymity = false;
     boolean isAvaliable = false;
 
+    ArrayList<VoteItem> voteItems = new ArrayList<VoteItem>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

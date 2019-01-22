@@ -11,10 +11,15 @@ public class ListItem {
     private String text;
     private String image;
     private String video;
+    private String media;
+    private String file;
+    private String vote;
+    private String map;
     private Button like;
     private Button comment;
     private String[] images;
     private String[] videos;
+    private String[] medias;
     private GridLayout gridLayout;
 
     public ListItem(String text, GridLayout gridLayout) {
@@ -22,9 +27,17 @@ public class ListItem {
         this.gridLayout = gridLayout;
     }
 
-    public ListItem(String[] images, String[] videos) {
-        this.images = images;
-        this.videos = videos;
+    public ListItem(String date, String userImage, String userName, String text, String[] medias,
+                    String file, String vote, String map) {
+        this.date = date;
+        this.userImage = userImage;
+        this.userName = userName;
+        this.text = text;
+        this.medias = medias;
+        this.file = file;
+        this.vote = vote;
+        this.map = map;
+
     }
 
     public ListItem(String userImage, String userName, String date, String text, String image) {
@@ -124,5 +137,45 @@ public class ListItem {
 
     public void setVideos(String[] videos) {
         this.videos = videos;
+    }
+
+    public String getMedia() {
+        return media;
+    }
+
+    public void setMedia(String media) {
+        this.media = media;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file;
+    }
+
+    public String getVote() {
+        return vote;
+    }
+
+    public void setVote(String vote) {
+        this.vote = vote;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
+    }
+
+    public String[] getMedias() {
+        return medias;
+    }
+
+    public void setMedias(String[] medias) {
+        this.medias = medias;
     }
 }

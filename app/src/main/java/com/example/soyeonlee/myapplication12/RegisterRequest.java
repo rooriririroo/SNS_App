@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterRequest extends StringRequest {
-    final static private String URL = "http://192.168.0.4:8888/android_login_api/register.php";
+    final static private String URL = IPAddress.IPAddress + "/android_login_api/register.php";
     private Map<String, String> parameters;
 
     public RegisterRequest(String userID, String userPassword, String userName, String userBirth, String userPhone,

@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class ImageRequest extends StringRequest {
 
-    final static private String URL = "http://192.168.0.4:8888/send_data.php";
+    final static private String URL = IPAddress.IPAddress + "/send_data.php";
+    //final static private String URL = "http://192.168.0.8:8888/send_data.php";
     private Map<String, String> parameters;
 
     public ImageRequest(String inputImage, Response.Listener<String> listener) {
