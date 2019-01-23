@@ -27,11 +27,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 public class FileActivity extends AppCompatActivity {
 
@@ -61,7 +64,7 @@ public class FileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("파일");
 
-        Log.d("[File]=>","onCreate");
+        Log.d("[File]=>","onCreate" + getExternalMounts().toString());
 
         fileListItemArrayList = new ArrayList<FileListItem>();
         listView = findViewById(R.id.file_list);
@@ -112,11 +115,22 @@ public class FileActivity extends AppCompatActivity {
                 }
             }
         });
+
+        String[] externalArray;
+        String secondaryStorage = System.getenv("SECONDARY_STORAGE");
+        if(secondaryStorage != null)
+            externalArray = secondaryStorage.split(":");
+        else
+            externalArray = new String[0];
+        for(int i = 0; i<externalArray.length; i++)
+            Log.d("Secondary Storage=>",externalArray[i]);
     }
 
     public void initFileList(File directory) {
         File[] fileList = directory.listFiles();
         fileListItemArrayList.clear();
+        //fileListItemArrayList.add(new FileListItem("상위 폴더로 이동",exP.getAbsolutePath(),true,false));
+        //fileListItemArrayList.add(new FileListItem("상위 폴더로 이동","/storage/0000-0000",true,false));//
 
         if(fileList != null)  {
             for(File file:fileList) {
@@ -287,5 +301,39 @@ public class FileActivity extends AppCompatActivity {
             }
             return convertView;
         }
+    }
+
+    static public HashSet<String> getExternalMounts(){
+        final HashSet<String> out = new HashSet<String>();
+        String reg = "(?i).*vold.*(vfat|ntfs|exfat|fat32|ext3|ext4).*rw.*";
+        String s = "";
+        try {
+            final Process process = new ProcessBuilder().command("mount").redirectErrorStream(true).start();
+            process.waitFor();
+            final InputStream is = process.getInputStream();
+            final byte[] buffer = new byte[1024];
+            while (is.read(buffer) != -1) {
+                s = s + new String(buffer);
+            }
+            is.close();
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+
+        // parse output
+        final String[] lines = s.split("\n");
+        for (String line : lines) {
+            if (!line.toLowerCase(Locale.US).contains("asec")) {
+                if (line.matches(reg)) {
+                    String[] parts = line.split(" ");
+                    for (String part : parts) {
+                        if (part.startsWith("/"))
+                            if (!part.toLowerCase(Locale.US).contains("vold"))
+                                out.add(part);
+                    }
+                }
+            }
+        }
+        return out;
     }
 }

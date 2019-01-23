@@ -13,6 +13,7 @@
         android:layout_height="150dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="70dp"
+        android:scaleType="fitXY"
         android:src="@drawable/ir" />
 
     <EditText

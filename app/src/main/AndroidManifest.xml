@@ -60,7 +60,9 @@
         <activity android:name=".CaptureImageActivity" />
         <activity android:name=".CaptureVideoActivity" />
         <activity android:name=".FileActivity" />
-        <activity android:name=".ProfileChangeActivity"></activity>
+        <activity android:name=".ProfileChangeActivity" />
+        <activity android:name=".CropImageActivity"/>
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity"/>
     </application>
 
 </manifest>

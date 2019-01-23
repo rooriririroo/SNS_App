@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -20,8 +21,19 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 
+import org.json.JSONObject;
+
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,6 +52,11 @@ public class ProfileChangeActivity extends AppCompatActivity {
     boolean isModify = false;
     boolean isDelete = false;
 
+    String changedImage = "";
+    String uploadServerPath = null;
+    String uploadServerUri = null;
+    int serverResponseCode = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +64,9 @@ public class ProfileChangeActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("프로필 설정");
+
+        uploadServerUri = IPAddress.IPAddress + "/profile_server.php";
+        uploadServerPath = IPAddress.IPAddress + "/userProfile/";
 
         loginUserInfo = getSharedPreferences("loginUserInfo",Activity.MODE_PRIVATE);
 
@@ -71,7 +91,9 @@ public class ProfileChangeActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         if(which == 0) {
                             isModify = true;
-                            Toast.makeText(getApplicationContext(),items[0],Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(ProfileChangeActivity.this, GalleryActivity.class);
+                            intent.putExtra("FromProfile",1);
+                            startActivity(intent);
                         }
                         else if (which == 1) {
                             isDelete = true;
@@ -134,13 +156,69 @@ public class ProfileChangeActivity extends AppCompatActivity {
         profile_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                File fileName  = new File(changedImage);
+                String imageForDB = uploadServerPath + fileName.getName();
+
+                String userID = loginUserInfo.getString("userID",null);
+                String userName = profile_name.getText().toString();
+                String userNickname = profile_nickname.getText().toString();
+                String userBirth = profile_birth.getText().toString();
+                String userPhone = profile_phone.getText().toString();
+                String userImage = "";
+
+                loginUserInfo.edit().putString("userName",profile_name.getText().toString()).apply();
+                loginUserInfo.edit().putString("userNickname",profile_nickname.getText().toString()).apply();
+                loginUserInfo.edit().putString("userBirth",profile_birth.getText().toString()).apply();
+                loginUserInfo.edit().putString("userPhone",profile_phone.getText().toString()).apply();
+
                 if(isModify) {
-                    loginUserInfo.edit().putString("userImage","").apply();
+                    loginUserInfo.edit().putString("userImage",imageForDB).apply();
+                    userImage = imageForDB;
                 }
 
                 if(isDelete) {
                     loginUserInfo.edit().putString("userImage","").apply();
+                    userImage = "";
                 }
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                            }
+                        });
+                        uploadFile(changedImage);
+                    }
+                }).start();
+
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try{
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+
+                            if(success) {
+                                Toast.makeText(getApplicationContext(),"변경 완료",Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(),"변경 실패",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                ProfileChangeRequest profileChangeRequest = new ProfileChangeRequest(userID, userName, userBirth,
+                        userPhone, userNickname, userImage, responseListener);
+                RequestQueue queue = Volley.newRequestQueue(ProfileChangeActivity.this);
+                queue.add(profileChangeRequest);
+
+                Toast.makeText(getApplicationContext(),imageForDB,Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -153,5 +231,110 @@ public class ProfileChangeActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if(intent.hasExtra("cropImage")) {
+            changedImage = intent.getStringExtra("cropImage");
+            Glide.with(getApplicationContext()).load(changedImage).into(profile_image);
+        }
+    }
+
+    public int uploadFile(String sourceFileUri) {
+
+        HttpURLConnection conn = null;
+        DataOutputStream dos = null;
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        String boundary = "*****";
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1 * 1024 * 1024;
+        File sourceFile = new File(sourceFileUri);
+
+        if (!sourceFile.isFile()) {
+            Log.e("uploadFile","Soure File not exist");
+            runOnUiThread(new Runnable() {
+                public void run() {
+
+                }
+            });
+            return 0;
+        }
+
+        else {
+            try {
+                // open a URL connection to the Servlet
+                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+                URL url = new URL(uploadServerUri);
+
+                // Open a HTTP  connection to  the URL
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput(true); // Allow Inputs
+                conn.setDoOutput(true); // Allow Outputs
+                conn.setUseCaches(false); // Don't use a Cached Copy
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                conn.setRequestProperty("uploaded_file", sourceFileUri);
+
+                dos = new DataOutputStream(conn.getOutputStream());
+                dos.writeBytes(twoHyphens + boundary + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                        + sourceFileUri + "\"" + lineEnd);
+                dos.writeBytes(lineEnd);
+
+                // create a buffer of  maximum size
+                bytesAvailable = fileInputStream.available();
+
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+
+                // read file and write it into form...
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                while (bytesRead > 0) {
+                    dos.write(buffer, 0, bufferSize);
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                }
+
+                // send multipart form data necesssary after file data...
+                dos.writeBytes(lineEnd);
+                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                // Responses from the server (code and message)
+                serverResponseCode = conn.getResponseCode();
+                String serverResponseMessage = conn.getResponseMessage();
+
+                Log.i("uploadFile ", "HTTP Response is : " + serverResponseMessage + ": " + serverResponseCode);
+
+                if (serverResponseCode == 200) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(ProfileChangeActivity.this, "File Upload Complete.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                //close the streams //
+                fileInputStream.close();
+                dos.flush();
+                dos.close();
+
+            } catch (MalformedURLException ex) {
+                ex.printStackTrace();
+                Log.e("Upload file to server ", "Error: " + ex.getMessage(), ex);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("Upload file to server ", "Exception: " + e.getMessage(), e);
+            }
+            return serverResponseCode;
+        } // End else block
     }
 }

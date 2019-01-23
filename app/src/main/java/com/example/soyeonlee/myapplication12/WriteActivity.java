@@ -138,7 +138,7 @@ public class WriteActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("글쓰기");
 
-        uploadServerUri = IPAddress.IPAddress + "/upload.php";
+        uploadServerUri = IPAddress.IPAddress + "/upload_server.php";
         uploadServerPath = IPAddress.IPAddress + "/upload/";
 
         linearLayout = (LinearLayout) findViewById(R.id.dynamic_layout);
@@ -159,6 +159,7 @@ public class WriteActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(WriteActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
                 } else {
                     Intent intent = new Intent(WriteActivity.this, GalleryActivity.class);
+                    intent.putExtra("FromWrite",0);
                     startActivity(intent);
                 }
             }

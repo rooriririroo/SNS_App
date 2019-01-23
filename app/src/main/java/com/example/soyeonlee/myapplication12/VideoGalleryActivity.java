@@ -47,19 +47,32 @@ public class VideoGalleryActivity extends AppCompatActivity {
         adapter = new GalleryListItemAdapter(this,galleryListItemArrayList);
         listView.setAdapter(adapter);
 
-        //if(state.equals(Environment.MEDIA_MOUNTED)) {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File filePath = new File(path);
-        galleryList(filePath);
+        if(state.equals(Environment.MEDIA_MOUNTED)) {
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File filePath = new File(path);
+            galleryList(filePath);
 
-        Collections.sort(galleryListItemArrayList, new Comparator<GalleryListItem>() {
-            @Override
-            public int compare(GalleryListItem o1, GalleryListItem o2) {
-                return o1.getGalleryTitle().compareTo(o2.getGalleryTitle());
-            }
-        });
-        adapter.notifyDataSetChanged();
-        //}
+            Collections.sort(galleryListItemArrayList, new Comparator<GalleryListItem>() {
+                @Override
+                public int compare(GalleryListItem o1, GalleryListItem o2) {
+                    return o1.getGalleryTitle().compareTo(o2.getGalleryTitle());
+                }
+            });
+            adapter.notifyDataSetChanged();
+        }
+
+        else {
+            File path = Environment.getRootDirectory();
+            galleryList(path);
+
+            Collections.sort(galleryListItemArrayList, new Comparator<GalleryListItem>() {
+                @Override
+                public int compare(GalleryListItem o1, GalleryListItem o2) {
+                    return o1.getGalleryTitle().compareTo(o2.getGalleryTitle());
+                }
+            });
+            adapter.notifyDataSetChanged();
+        }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

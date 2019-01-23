@@ -55,7 +55,7 @@ public class GalleryActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("사진");
 
-        Log.d("[Gallery]=>","onCreate");
+        Log.d("[Gallery]=>","oncreate");
 
         galleryListItemArrayList = new ArrayList<GalleryListItem>();
         listView = findViewById(R.id.gallery_list);
@@ -63,27 +63,55 @@ public class GalleryActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
         //if(state.equals(Environment.MEDIA_MOUNTED)) {
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File filePath = new File(path);
-        galleryList(filePath);
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File filePath = new File(path);
+            galleryList(filePath);
 
-        Collections.sort(galleryListItemArrayList, new Comparator<GalleryListItem>() {
-            @Override
-            public int compare(GalleryListItem o1, GalleryListItem o2) {
-                return o1.getGalleryTitle().compareTo(o2.getGalleryTitle());
-            }
-        });
-        adapter.notifyDataSetChanged();
+            Collections.sort(galleryListItemArrayList, new Comparator<GalleryListItem>() {
+                @Override
+                public int compare(GalleryListItem o1, GalleryListItem o2) {
+                    return o1.getGalleryTitle().compareTo(o2.getGalleryTitle());
+                }
+            });
+            adapter.notifyDataSetChanged();
         //}
+
+        /*
+        else {
+            File path = Environment.getRootDirectory();
+            galleryList(path);
+
+            Collections.sort(galleryListItemArrayList, new Comparator<GalleryListItem>() {
+                @Override
+                public int compare(GalleryListItem o1, GalleryListItem o2) {
+                    return o1.getGalleryTitle().compareTo(o2.getGalleryTitle());
+                }
+            });
+            adapter.notifyDataSetChanged();
+        }*/
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String intentPath = galleryListItemArrayList.get(position).getGalleryTitle();
+
                 Intent intent = new Intent(GalleryActivity.this,GridActivity.class);
                 intent.putExtra("folderPath",galleryListItemArrayList.get(position).getGalleryPath());
                 intent.putExtra("folderName",galleryListItemArrayList.get(position).getGalleryTitle());
+                if(getIntent().hasExtra("FromWrite"))
+                    intent.putExtra("FromWrite",0);
+                else if(getIntent().hasExtra("FromProfile"))
+                    intent.putExtra("FromProfile",1);
+                else if(getIntent().hasExtra("FromRegister"))
+                    intent.putExtra("FromRegister",2);
                 startActivity(intent);
+
+
+                /*
+                Intent intent = new Intent(GalleryActivity.this,GridActivity.class);
+                intent.putExtra("folderPath",galleryListItemArrayList.get(position).getGalleryPath());
+                intent.putExtra("folderName",galleryListItemArrayList.get(position).getGalleryTitle());
+                startActivity(intent);*/
             }
         });
     }

@@ -65,6 +65,8 @@ public class RegisterActivity extends AppCompatActivity {
     String uploadServerUri = null;
     int serverResponseCode = 0;
 
+    String registerImage = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
 
-        uploadServerUri = IPAddress.IPAddress + "/user_profile.php";
+        uploadServerUri = IPAddress.IPAddress + "/register_server.php";
         uploadServerPath = IPAddress.IPAddress + "/userProfile/";
 
         register_name = findViewById(R.id.register_name);
@@ -118,8 +120,9 @@ public class RegisterActivity extends AppCompatActivity {
                 + register_birth3.getText().toString() + "일";
         String userNickname = register_nickname.getText().toString();
         //String userImage = uri.toString();
-        File filePath = new File(getRealPath(uri));
-        String userImage = uploadServerPath + filePath.getName();
+        //File filePath = new File(getRealPath(uri));
+        //String userImage = uploadServerPath + filePath.getName();
+        String userImage = registerImage;
         String userDate = String.format("%d년 %02d월 %02d일",year,month+1,day);
 
         if(!validate) {
@@ -148,7 +151,8 @@ public class RegisterActivity extends AppCompatActivity {
                     public void run() {
                     }
                 });
-                uploadFile(getRealPath(uri));
+                //uploadFile(getRealPath(uri));
+                uploadFile(registerImage);
             }
         }).start();
 
@@ -235,13 +239,33 @@ public class RegisterActivity extends AppCompatActivity {
     // 프로필 사진 등록 버튼
     public void profileImageClick(View v) {
         album_open = true;
+        Intent intent = new Intent(RegisterActivity.this, GalleryActivity.class);
+        intent.putExtra("FromRegister",2);
+        startActivity(intent);
+
+        /*
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,REQUEST_IMAGE);
+        startActivityForResult(intent,REQUEST_IMAGE);*/
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+       /* if (intent.hasExtra("images")) {
+            changedImage = intent.getStringArrayListExtra("images").get(0);
+            Glide.with(getApplicationContext()).load(changedImage).into(profile_image);
+        }*/
+        if(intent.hasExtra("cropImage")) {
+            registerImage = intent.getStringExtra("cropImage");
+            Glide.with(getApplicationContext()).load(registerImage).into(register_image);
+        }
+    }
+
+    /*protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+
         if(requestCode == REQUEST_IMAGE) {
             if(resultCode == RESULT_OK) {
                 try {
@@ -253,7 +277,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         }
-    }
+    }*/
 
     private String getRealPath(Uri cUri) {
         String[] projection = {MediaStore.Images.Media.DATA};
