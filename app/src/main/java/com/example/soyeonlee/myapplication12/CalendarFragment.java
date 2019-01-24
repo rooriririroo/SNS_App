@@ -1,8 +1,10 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CalendarView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -31,6 +35,10 @@ public class CalendarFragment extends Fragment {
     ArrayList<CalendarListItem> calendarListItemArrayList;
     CalendarListItemAdapter adapter;
 
+    int selectYear;
+    int selectMonth;
+    int selectDay;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_calendar,container,false);
@@ -49,6 +57,10 @@ public class CalendarFragment extends Fragment {
             public void onSelectedDayChange(CalendarView view, final int year, final int month, final int dayOfMonth) {
                 final String strDate = String.format(Locale.KOREA,"%02d월%02d일",month+1,dayOfMonth);
                 calendarListItemArrayList.clear();
+                selectYear = year;
+                selectMonth = month;
+                selectDay = dayOfMonth;
+                Toast.makeText(getContext(),String.valueOf(month+1)+String.valueOf(dayOfMonth)+getWeek(year,month,dayOfMonth),Toast.LENGTH_SHORT).show();
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -106,9 +118,12 @@ public class CalendarFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int curId = menuItem.getItemId();
         if(curId == R.id.menu_plus) {
-            Intent intent = new Intent(getContext(),WriteActivity.class);
+            Intent intent = new Intent(getActivity(),ScheduleActivity.class);
+            intent.putExtra("year",selectYear);
+            intent.putExtra("month",selectMonth+1);
+            intent.putExtra("day",selectDay);
+            intent.putExtra("week",getWeek(selectYear,selectMonth,selectDay));
             startActivity(intent);
-
         }
         return super.onOptionsItemSelected(menuItem);
     }

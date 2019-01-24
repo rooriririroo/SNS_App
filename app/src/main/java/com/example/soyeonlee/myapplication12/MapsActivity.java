@@ -81,12 +81,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int PLACE_PICKER_REQUEST = 1;
     private static final LatLngBounds BOUNDS_VIEW = new LatLngBounds(new LatLng(37.56, 126.98), new LatLng(37.57, 127.02));
 
-    Button map_search_button;
-    TextView map_result_title;
-    TextView map_result_count;
-    ListView map_result_list;
-    Button map_result_down;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,23 +88,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("지도");
-
-        /*
-        map_result_title = findViewById(R.id.map_result_title);
-        map_result_count = findViewById(R.id.map_result_count);
-        map_result_down = findViewById(R.id.map_result_down);
-        map_result_list = findViewById(R.id.map_result_list);
-
-        map_search_button = findViewById(R.id.map_search_button);
-        map_search_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                map_result_title.setVisibility(View.VISIBLE);
-                map_result_count.setVisibility(View.VISIBLE);
-                map_result_down.setVisibility(View.VISIBLE);
-                map_result_list.setVisibility(View.VISIBLE);
-            }
-        });*/
 
         locationRequest = new LocationRequest().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 //.setInterval(UPDATE_INTERVAL_MS).setFastestInterval(FASTEST_UPDATE_INTERVAL_MS); // 이걸 설정하면 계속 초기 좌표로 돌아감
@@ -138,12 +115,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     @Override
                     public void onInfoWindowClick(Marker marker) {
-                        Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
-                        intent.putExtra("Address",getCurrentAddress(place.getLatLng()));
-                        intent.putExtra("Name",place.getName());
-                        setResult(RESULT_OK,intent);
-                        //startActivity(intent);
-                        finish();
+                        if(getIntent().hasExtra("FromWrite")) {
+                            Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
+                            intent.putExtra("Address",getCurrentAddress(place.getLatLng()));
+                            intent.putExtra("Name",place.getName());
+                            setResult(RESULT_OK,intent);
+                            finish();
+                        }
+                        else if(getIntent().hasExtra("FromSchedule")) {
+                            Intent intent = new Intent(MapsActivity.this,ScheduleActivity.class);
+                            intent.putExtra("Address",getCurrentAddress(place.getLatLng()));
+                            intent.putExtra("Name",place.getName());
+                            setResult(RESULT_OK,intent);
+                            finish();
+                        }
                     }
                 });
 
@@ -258,11 +243,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     @Override
                     public void onInfoWindowClick(Marker marker) {
-                        Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
-                        intent.putExtra("Address",getCurrentAddress(latLng));
-                        setResult(RESULT_OK,intent);
-                        //startActivity(intent);
-                        finish();
+                        if(getIntent().hasExtra("FromWrite")) {
+                            Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
+                            intent.putExtra("Address",getCurrentAddress(latLng));
+                            setResult(RESULT_OK,intent);
+                            finish();
+                        }
+
+                        else if(getIntent().hasExtra("FromSchedule")) {
+                            Intent intent = new Intent(MapsActivity.this,ScheduleActivity.class);
+                            intent.putExtra("Address",getCurrentAddress(latLng));
+                            setResult(RESULT_OK,intent);
+                            finish();
+                        }
                     }
                 });
 

@@ -207,6 +207,7 @@ public class WriteActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                intent.putExtra("FromWrite",0);
                 startActivityForResult(intent, REQUEST_MAP);
             }
         });

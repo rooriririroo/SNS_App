@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ScheduleActivity">
+
+    <EditText
+        android:id="@+id/schedule_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        android:ems="16"
+        android:hint="제목"/>
+
+    <EditText
+        android:id="@+id/schedule_sub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:ems="16"
+        android:hint="설명"/>
+
+    <LinearLayout
+        android:id="@+id/schedule_layoutWhen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:id="@+id/schedule_when"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="20dp"
+            android:text="하루 종일"
+            android:drawableStart="@drawable/outline_schedule_black_18dp"
+            android:drawablePadding="15dp"/>
+
+        <Switch
+            android:id="@+id/schedule_switchWhen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/schedule_startDate"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="55dp"
+            android:text="2019년01월24일"/>
+
+        <TextView
+            android:id="@+id/schedule_startTime"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="45dp"
+            android:gravity="end"
+            android:text="오후 3:00"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
+
+        <TextView
+            android:id="@+id/schedule_endDate"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="55dp"
+            android:hint="종료일"/>
+
+        <TextView
+            android:id="@+id/schedule_endTime"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="45dp"
+            android:gravity="end"
+            android:hint="종료시간"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/schedule_layoutMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/schedule_map"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:drawableStart="@drawable/outline_place_black_18dp_small"
+            android:drawablePadding="15dp"
+            android:text="지도"/>
+
+        <TextView
+            android:id="@+id/schedule_mapSet"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:gravity="end"
+            android:hint="없음"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/schedule_layoutShare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/schedule_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="20dp"
+            android:drawableStart="@drawable/outline_create_black_18dp_small"
+            android:drawablePadding="15dp"
+            android:text="게시글로 공유"/>
+
+        <Switch
+            android:id="@+id/schedule_switchShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/schedule_layoutAlarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/schedule_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:drawableStart="@drawable/outline_notifications_black_18dp"
+            android:drawablePadding="15dp"
+            android:text="알림"/>
+
+        <TextView
+            android:id="@+id/schedule_alarmSet"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="170dp"
+            android:gravity="end"
+            android:hint="없음"/>
+
+    </LinearLayout>
+</LinearLayout>
