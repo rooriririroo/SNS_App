@@ -37,6 +37,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class ProfileChangeActivity extends AppCompatActivity {
 
@@ -136,8 +137,9 @@ public class ProfileChangeActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         try{
-                            String birth = String.valueOf(year) + "년" + String.valueOf(month+1) + "월" +
-                                    String.valueOf(dayOfMonth) + "일";
+                            String birth = String.format(Locale.KOREA,"%d년%02d월%02d일",year,month+1,dayOfMonth);
+                            //String birth = String.valueOf(year) + "년" + String.valueOf(month+1) + "월" +
+                                    //String.valueOf(dayOfMonth) + "일";
                             profile_birth.setText(birth);
                         }
                         catch (Exception e) {

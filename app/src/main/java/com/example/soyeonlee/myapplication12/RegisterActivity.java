@@ -122,7 +122,9 @@ public class RegisterActivity extends AppCompatActivity {
         //String userImage = uri.toString();
         //File filePath = new File(getRealPath(uri));
         //String userImage = uploadServerPath + filePath.getName();
-        String userImage = registerImage;
+        File fileName  = new File(registerImage);
+        String imageForDB = uploadServerPath + fileName.getName();
+        String userImage = imageForDB;
         String userDate = String.format("%d년 %02d월 %02d일",year,month+1,day);
 
         if(!validate) {
