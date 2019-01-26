@@ -20,6 +20,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -48,10 +58,14 @@ public class ScheduleActivity extends AppCompatActivity {
     int iMonth;
     int iDay;
     String iWeek;
+    String inputStartDate;
+    String inputEndDate;
 
     boolean isShared = false;
+    boolean isAllday = false;
     int REQUEST_MAP = 1000;
 
+    ArrayList<String> maps = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,17 +90,24 @@ public class ScheduleActivity extends AppCompatActivity {
         iWeek = intent.getStringExtra("week");
 
         schedule_title = findViewById(R.id.schedule_title);
+        schedule_title.setText("");
+        if(getIntent().hasExtra("dialogTitle"))
+            schedule_title.setText(getIntent().getStringExtra("dialogTitle"));
+
         schedule_sub = findViewById(R.id.schedule_sub);
+        schedule_sub.setText("");
 
         schedule_switchWhen = findViewById(R.id.schedule_switchWhen);
         schedule_switchWhen.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
+                    isAllday = true;
                     schedule_startTime.setVisibility(View.GONE);
                     schedule_endTime.setVisibility(View.GONE);
                 }
                 else {
+                    isAllday = false;
                     schedule_startTime.setVisibility(View.VISIBLE);
                     schedule_endTime.setVisibility(View.VISIBLE);
                 }
@@ -96,9 +117,12 @@ public class ScheduleActivity extends AppCompatActivity {
         String startDate = "";
         if(iYear!=0) {
             startDate = iYear + "." + iMonth + "." + iDay + "." + " (" + iWeek + ")";
+            inputStartDate = iYear + "." + iMonth + "." + iDay + "." + " (" + iWeek + ")";
         }
         else {
             startDate = String.valueOf(cYear) + "." + String.valueOf(cMonth) + "."
+                    + String.valueOf(cDay) + "." + " (" + getWeek(cYear, cMonth-1, cDay) + ")";
+            inputStartDate = String.valueOf(cYear) + "." + String.valueOf(cMonth) + "."
                     + String.valueOf(cDay) + "." + " (" + getWeek(cYear, cMonth-1, cDay) + ")";
         }
         schedule_startDate = findViewById(R.id.schedule_startDate);
@@ -112,6 +136,8 @@ public class ScheduleActivity extends AppCompatActivity {
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                 try{
                                     String date = String.format(Locale.KOREA,"%d.%d.%d.",year,month+1,dayOfMonth)
+                                            + "  ("+getWeek(year,month,dayOfMonth)+")";
+                                    inputStartDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth)
                                             + "  ("+getWeek(year,month,dayOfMonth)+")";
                                     schedule_startDate.setText(date);
                                 }
@@ -127,22 +153,11 @@ public class ScheduleActivity extends AppCompatActivity {
         String startTime = "";
         switch (calendar.get(Calendar.AM_PM)) {
             case Calendar.AM:
-                startTime = "오전 "+String.valueOf(cHour) + ":"
-                        + String.valueOf(cMinute);
+                startTime = "오전 " + String.format(Locale.KOREA,"%d:%02d",cHour,cMinute);
                 break;
             case Calendar.PM:
-                startTime = "오후 "+String.valueOf(cHour) + ":"
-                        + String.valueOf(cMinute);
+                startTime = "오후 " + String.format(Locale.KOREA,"%d:%02d",cHour,cMinute);
         }
-        /*
-        if(cHour>=12 && cHour<=23) {
-            startTime = "오후"+String.valueOf(cHour) + ":"
-                    + String.valueOf(cMinute);
-        }
-        else {
-            startTime = "오전"+String.valueOf(cHour) + ":"
-                    + String.valueOf(cMinute);
-        }*/
         schedule_startTime = findViewById(R.id.schedule_startTime);
         schedule_startTime.setText(startTime);
         schedule_startTime.setOnClickListener(new View.OnClickListener() {
@@ -159,18 +174,18 @@ public class ScheduleActivity extends AppCompatActivity {
                                 if(hourOfDay>=12 && hourOfDay<=23) {
                                     if(hourOfDay%12 == 0) {
                                         hourOfDay = 12;
-                                        time = "오후 " + String.valueOf(hourOfDay) + ":" + String.valueOf(minute);
+                                        time = "오후 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay,minute);
                                     }
                                     else
-                                        time = "오후 " + String.valueOf(hourOfDay%12) + ":" + String.valueOf(minute);
+                                        time = "오후 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay%12,minute);
                                 }
                                 else {
                                     if(hourOfDay%12 == 0) {
                                         hourOfDay = 12;
-                                        time = "오전 " + String.valueOf(hourOfDay) + ":" + String.valueOf(minute);
+                                        time = "오전 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay,minute);
                                     }
                                     else
-                                        time = "오전 " + String.valueOf(hourOfDay) + ":" + String.valueOf(minute);
+                                        time = "오전 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay,minute);
                                 }
                                 schedule_startTime.setText(time);
                             }
@@ -181,6 +196,7 @@ public class ScheduleActivity extends AppCompatActivity {
         });
 
         schedule_endDate = findViewById(R.id.schedule_endDate);
+        schedule_endDate.setText("");
         schedule_endDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,6 +206,8 @@ public class ScheduleActivity extends AppCompatActivity {
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                 try{
                                     String date = String.format(Locale.KOREA,"%d.%d.%d.",year,month+1,dayOfMonth)
+                                            + " ("+getWeek(year,month,dayOfMonth)+")";
+                                    inputEndDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth)
                                             + " ("+getWeek(year,month,dayOfMonth)+")";
                                     schedule_endDate.setText(date);
                                 }
@@ -203,6 +221,7 @@ public class ScheduleActivity extends AppCompatActivity {
         });
 
         schedule_endTime = findViewById(R.id.schedule_endTime);
+        schedule_endTime.setText("");
         schedule_endTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,18 +233,18 @@ public class ScheduleActivity extends AppCompatActivity {
                                 if(hourOfDay>=12 && hourOfDay<=23) {
                                     if(hourOfDay%12 == 0) {
                                         hourOfDay = 12;
-                                        time = "오후 " + String.valueOf(hourOfDay) + ":" + String.valueOf(minute);
+                                        time = "오후 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay,minute);
                                     }
                                     else
-                                        time = "오후 " + String.valueOf(hourOfDay%12) + ":" + String.valueOf(minute);
+                                        time = "오후 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay%12,minute);
                                 }
                                 else {
                                     if(hourOfDay%12 == 0) {
                                         hourOfDay = 12;
-                                        time = "오전 " + String.valueOf(hourOfDay) + ":" + String.valueOf(minute);
+                                        time = "오전 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay,minute);
                                     }
                                     else
-                                        time = "오전 " + String.valueOf(hourOfDay) + ":" + String.valueOf(minute);
+                                        time = "오전 " + String.format(Locale.KOREA,"%d:%02d",hourOfDay,minute);
                                 }
                                 schedule_endTime.setText(time);
                             }
@@ -322,6 +341,53 @@ public class ScheduleActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_save_button:
+
+                if(getIntent().hasExtra("FromScheduleModify")) {
+
+                }
+                else {
+
+                    String title = schedule_title.getText().toString();
+                    String sub = schedule_sub.getText().toString();
+                    String startDate = schedule_startDate.getText().toString();
+                    String startTime = schedule_startTime.getText().toString();
+                    String endDate = schedule_endDate.getText().toString();
+                    String endTime = schedule_endTime.getText().toString();
+                    String allDay = "";
+                    if(isAllday) {
+                        allDay = "하루종일";
+                        startTime = "";
+                        endTime = "";
+                    }
+                    String alarm = schedule_alarmSet.getText().toString();
+                    String map = maps.toString();
+
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try{
+                                JSONObject jsonResponse = new JSONObject(response);
+                                boolean success = jsonResponse.getBoolean("success");
+
+                                if(success) {
+                                    Toast.makeText(getApplicationContext(),"일정 추가 성공",Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                                else {
+                                    Toast.makeText(getApplicationContext(),"일정 추가 실패",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    ScheduleRequest scheduleRequest = new ScheduleRequest(title, sub, allDay, startDate, startTime,
+                            endDate, endTime, alarm, map, responseListener);
+                    RequestQueue queue = Volley.newRequestQueue(ScheduleActivity.this);
+                    queue.add(scheduleRequest);
+                }
                 return true;
         }
         return super.onOptionsItemSelected(menuItem);
@@ -332,6 +398,12 @@ public class ScheduleActivity extends AppCompatActivity {
         if(requestCode == REQUEST_MAP) {
             if(resultCode == RESULT_OK) {
                 schedule_mapSet.setText("첨부됨");
+                if(data.hasExtra("Name")) {
+                   maps.add(data.getStringExtra("Name"));
+                   maps.add(data.getStringExtra("Address"));
+                }
+                else
+                    maps.add(data.getStringExtra("Address"));
             }
         }
     }

@@ -84,6 +84,7 @@ public class MemberFragment extends Fragment {
                         String userImage = object.get("userImage").getAsString();
                         String userDate = object.get("userDate").getAsString();
                         String userBirth = object.get("userBirth").getAsString();
+                        String userGender = object.get("userGender").getAsString();
 
                         memberListItemArrayList.add(new MemberListItem(userDate,userImage,userName,userNickname,userBirth,userPhone));
                     }

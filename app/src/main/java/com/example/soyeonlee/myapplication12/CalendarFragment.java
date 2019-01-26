@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -35,6 +36,7 @@ public class CalendarFragment extends Fragment {
     ArrayList<CalendarListItem> calendarListItemArrayList;
     CalendarListItemAdapter adapter;
 
+
     int selectYear;
     int selectMonth;
     int selectDay;
@@ -51,11 +53,18 @@ public class CalendarFragment extends Fragment {
         calendarListItemArrayList = new ArrayList<CalendarListItem>();
         adapter = new CalendarListItemAdapter(getContext(),calendarListItemArrayList);
         calender_list.setAdapter(adapter);
+        calender_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ScheduleDialog dialog = new ScheduleDialog(getActivity());
+                dialog.show();
+            }
+        });
         calendarView = rootView.findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, final int year, final int month, final int dayOfMonth) {
-                final String strDate = String.format(Locale.KOREA,"%02d월%02d일",month+1,dayOfMonth);
+                final String strDate = String.format(Locale.KOREA,"%d월 %d일",month+1,dayOfMonth);
                 calendarListItemArrayList.clear();
                 selectYear = year;
                 selectMonth = month;
@@ -71,22 +80,39 @@ public class CalendarFragment extends Fragment {
                             for(int i = 0; i<array.size(); i++) {
                                 JsonObject object = (JsonObject) array.get(i);
 
-                                String userName = object.get("userName").getAsString();
-                                String userBirth = object.get("userBirth").getAsString();
+                                String title = object.get("title").getAsString();
+                                String sub = object.get("sub").getAsString();
+                                String allDay = object.get("allDay").getAsString();
+                                String startDate = object.get("startDate").getAsString();
 
-                                if(userBirth.contains(strDate)) {
-                                    int yearID = userBirth.indexOf("년");
-                                    String sYear = userBirth.substring(0,yearID);
-                                    String findMonth = userBirth.substring(yearID+1);
+                                String startTime = "";
+                                if(!object.get("startTime").getAsString().equals("")) {
+                                    startTime = object.get("startTime").getAsString();
+                                }
 
-                                    int monthID = findMonth.indexOf("월");
-                                    String sMonth = findMonth.substring(0,monthID);
-                                    String findDay = findMonth.substring(monthID+1);
+                                String endDate = object.get("endDate").getAsString();
+
+                                String endTime = "";
+                                if(!object.get("endTime").getAsString().equals("")) {
+                                    endTime = " ~ " + object.get("endTime").getAsString();
+                                }
+
+                                String alarm = object.get("alarm").getAsString();
+
+                                String map = "";
+                                if(!object.get("map").getAsString().equals("")) {
+                                    map = "  |" + object.get("map").getAsString();
+                                }
+
+                                if(startDate.contains(strDate)) {
+                                    int monthID = startDate.indexOf("월");
+                                    String findDay = startDate.substring(monthID+1);
 
                                     int dayID = findDay.indexOf("일");
                                     final String sDay = findDay.substring(0,dayID);
 
-                                    calendarListItemArrayList.add(new CalendarListItem(sDay,getWeek(year,month,dayOfMonth),userName));
+                                    calendarListItemArrayList.add(new CalendarListItem(sDay,getWeek(year,month,dayOfMonth) + "요일",
+                                            title,startTime + endTime,map));
                                 }
                             }
                             adapter.notifyDataSetChanged();
@@ -97,9 +123,9 @@ public class CalendarFragment extends Fragment {
                     }
                 };
 
-                LoadMemberRequest loadMemberRequest = new LoadMemberRequest(responseListener);
+                LoadScheduleRequest loadScheduleRequest = new LoadScheduleRequest(responseListener);
                 RequestQueue queue = Volley.newRequestQueue(getContext());
-                queue.add(loadMemberRequest);
+                queue.add(loadScheduleRequest);
             }
         });
 

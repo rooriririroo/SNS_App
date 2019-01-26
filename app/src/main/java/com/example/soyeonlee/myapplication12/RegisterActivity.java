@@ -1,20 +1,37 @@
 package com.example.soyeonlee.myapplication12;
 
+import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -34,38 +51,55 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    SQLiteDatabase db;
-    UserInfoDBHelper helper;
 
     EditText register_name;
     EditText register_id;
     Button redundancy_button;
     EditText register_pw1;
     EditText register_pw2;
-    EditText register_birth1;
-    EditText register_birth2;
-    EditText register_birth3;
-    EditText register_phone1;
-    EditText register_phone2;
-    EditText register_phone3;
+    TextView register_equal;
+    TextView register_notice;
+    EditText register_birth;
+    EditText register_phone;
     EditText register_nickname;
     ImageView register_image;
+    RadioGroup register_group;
 
     Uri uri;
-    String uriToPath;
-    boolean validate = false;
+    boolean validateID = false;
     boolean album_open = false;
-
-    int REQUEST_IMAGE = 1000;
+    boolean validatePW = false;
+    boolean equalPW = false;
 
     String uploadServerPath = null;
     String uploadServerUri = null;
     int serverResponseCode = 0;
 
     String registerImage = "";
+    String imageForDB;
+
+    Calendar calendar;
+    int year;
+    int month;
+    int day;
+
+    String userID;
+    String userPassword;
+    String userName;
+    String userNickname;
+    String userBirth;
+    String userPhone;
+    String userImage;
+    String userGender;
+    String userDate;
+
+    String inputBirth;
+    String inputTitle;
 
 
     @Override
@@ -73,122 +107,306 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.custom_actionbar_write);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("회원가입");
 
         uploadServerUri = IPAddress.IPAddress + "/register_server.php";
         uploadServerPath = IPAddress.IPAddress + "/userProfile/";
 
+        calendar = Calendar.getInstance();
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+
         register_name = findViewById(R.id.register_name);
         register_id = findViewById(R.id.register_id);
-        //register_id.setPrivateImeOptions("defaultInputmode=english;");
+        register_id.setPrivateImeOptions("defaultInputmode=english;");
         redundancy_button = findViewById(R.id.redundancy_button);
+
+        register_equal = findViewById(R.id.register_equal);
+        register_equal.setVisibility(View.GONE);
+
+        register_notice = findViewById(R.id.register_notice);
+
         register_pw1 = findViewById(R.id.register_pw1);
-        register_pw2 = findViewById(R.id.register_pw2);
-        register_birth1 = findViewById(R.id.register_birth1);
-        register_birth2 = findViewById(R.id.register_birth2);
-        register_birth3 = findViewById(R.id.register_birth3);
-        register_phone1 = findViewById(R.id.register_phone1);
-        register_phone2 = findViewById(R.id.register_phone2);
-        register_phone3 = findViewById(R.id.register_phone3);
-        register_nickname = findViewById(R.id.register_nickname);
-        register_image = findViewById(R.id.register_image);
-
-
-        helper = new UserInfoDBHelper(this);
-    }
-
-    // 액션바 뒤로 버튼
-    public void backClick(View v) {
-        finish();
-    }
-
-    // 액션바 완료 버튼
-    public void saveClick(View v) {
-
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-        String userID = register_id.getText().toString();
-        String userPassword = register_pw1.getText().toString();
-        String userName = register_name.getText().toString();
-        String userPhone = register_phone1.getText().toString() + "-" + register_phone2.getText().toString() + "-"
-                + register_phone3.getText().toString();
-        String userBirth = register_birth1.getText().toString() + "년" + register_birth2.getText().toString() + "월"
-                + register_birth3.getText().toString() + "일";
-        String userNickname = register_nickname.getText().toString();
-        //String userImage = uri.toString();
-        //File filePath = new File(getRealPath(uri));
-        //String userImage = uploadServerPath + filePath.getName();
-        File fileName  = new File(registerImage);
-        String imageForDB = uploadServerPath + fileName.getName();
-        String userImage = imageForDB;
-        String userDate = String.format("%d년 %02d월 %02d일",year,month+1,day);
-
-        if(!validate) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("");
-            builder.setMessage("아이디 중복검사를 해주세요").setPositiveButton("OK",null).create();
-            builder.show();
-            return;
-        }
-
-        if(!album_open) {
-            userImage = "";
-        }
-
-        if(userID.equals("") || userPassword.equals("") || userName.equals("")) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("");
-            builder.setMessage("필수입력사항입니다.").setPositiveButton("OK",null).create();
-            builder.show();
-            return;
-        }
-
-        new Thread(new Runnable() {
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                    }
-                });
-                //uploadFile(getRealPath(uri));
-                uploadFile(registerImage);
-            }
-        }).start();
-
-        Response.Listener<String> responseListener = new Response.Listener<String>() {
+        register_pw1.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onResponse(String response) {
-                try{
-                    JSONObject jsonResponse = new JSONObject(response);
-                    boolean success = jsonResponse.getBoolean("success");
-
-                    if(success) {
-                        Toast.makeText(getApplicationContext(),"가입완료",Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                    else {
-                        Toast.makeText(getApplicationContext(),"가입실패",Toast.LENGTH_SHORT).show();
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                register_notice.setText("");
             }
-        };
 
-        RegisterRequest registerRequest = new RegisterRequest(userID, userPassword, userName, userBirth, userPhone,
-                userNickname, userImage, userDate, responseListener);
-        RequestQueue queue = Volley.newRequestQueue(RegisterActivity.this);
-        queue.add(registerRequest);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validatePassword();
+                equalPassword();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        register_pw2 = findViewById(R.id.register_pw2);
+        register_pw2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                equalPassword();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        register_birth = findViewById(R.id.register_birth);
+        register_birth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(RegisterActivity.this, android.app.AlertDialog.THEME_HOLO_LIGHT,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                                try{
+                                    String date = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth);
+                                    register_birth.setText(date);
+                                }
+                                catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },year,month,day);
+                datePickerDialog.show();
+            }
+        });
+
+        register_phone = findViewById(R.id.register_phone);
+        register_phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+
+        register_nickname = findViewById(R.id.register_nickname);
+        register_nickname.setText("");
+
+        register_image = findViewById(R.id.register_image);
+        register_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                album_open = true;
+                Intent intent = new Intent(RegisterActivity.this, GalleryActivity.class);
+                intent.putExtra("FromRegister",2);
+                startActivity(intent);
+            }
+        });
+
+        register_group = findViewById(R.id.register_group);
+        register_group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.register_man)
+                    userGender = "남자";
+                else if(checkedId == R.id.register_woman)
+                    userGender = "여자";
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_save, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.menu_save_button:
+                Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                userID = register_id.getText().toString();
+                userPassword = register_pw1.getText().toString();
+                userName = register_name.getText().toString();
+                userPhone = register_phone.getText().toString();
+                userBirth = register_birth.getText().toString();
+                inputBirth = userBirth.substring(userBirth.indexOf("년")+1).trim();
+                userNickname = register_nickname.getText().toString();
+                File fileName  = new File(registerImage);
+                imageForDB = uploadServerPath + fileName.getName();
+                userImage = imageForDB;
+                userDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,day);
+
+                if(!validateID) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("");
+                    builder.setMessage("아이디 중복검사를 해주세요 :-)").setPositiveButton("OK",null).create();
+                    builder.show();
+                    break;
+                }
+
+                if(!validatePW) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("");
+                    builder.setMessage("유효한 비밀번호가 아닙니다 :-)").setPositiveButton("OK",null).create();
+                    builder.show();
+                    break;
+                }
+
+                if(!equalPW) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("");
+                    builder.setMessage("비밀번호가 일치하지 않습니다 :-)").setPositiveButton("OK",null).create();
+                    builder.show();
+                    break;
+                }
+
+                if(userID.equals("") || userPassword.equals("") || userName.equals("") || userBirth.equals("")
+                        ||userPhone.equals("") || userGender.equals("")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("");
+                    builder.setMessage("필수입력사항을 모두 입력해주세요 :-)").setPositiveButton("OK",null).create();
+                    builder.show();
+                    break;
+                }
+
+                if(!album_open) {
+                    userImage = "";
+                }
+
+                if(album_open) {
+                    new Thread(new Runnable() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                }
+                            });
+                            //uploadFile(getRealPath(uri));
+                            uploadFile(registerImage);
+                        }
+                    }).start();
+                }
+
+
+                Response.Listener<String> registerListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try{
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+
+                            if(success) {
+                                Toast.makeText(getApplicationContext(),"가입완료",Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(),"가입실패",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                Response.Listener<String> scheduleListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try{
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+
+                            if(success) {
+                                Toast.makeText(getApplicationContext(),"가입완료",Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(),"가입실패",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                RegisterRequest registerRequest = new RegisterRequest(userID, userPassword, userName, userBirth, userPhone,
+                        userNickname, userImage, userGender, userDate, registerListener);
+                ScheduleRequest scheduleRequest = new ScheduleRequest(userName + " 생일","","",inputBirth,"","",
+                        "","없음","",scheduleListener);
+                RequestQueue queue = Volley.newRequestQueue(RegisterActivity.this);
+                queue.add(registerRequest);
+                queue.add(scheduleRequest);
+                return true;
+        }
+        return super.onOptionsItemSelected(menuItem);
+    }
+
+    public void validatePassword() {
+        String pattern = "^[a-zA-Z0-9!@.#$%^&*?_~+]{8,20}$";
+        Matcher matcher = Pattern.compile(pattern).matcher(register_pw1.getText().toString());
+        if(!matcher.matches()) {
+            if(register_pw1.getText().toString().equals(""))
+                register_notice.setText("");
+            else {
+                register_notice.setText("올바르지 않은 형식입니다.");
+                register_notice.setTextColor(Color.RED);
+                validatePW = false;
+            }
+        }
+        else {
+            if(register_pw1.getText().toString().equals(""))
+                register_notice.setText("");
+            else {
+                register_notice.setText("사용 가능한 비밀번호입니다.");
+                register_notice.setTextColor(Color.BLUE);
+                validatePW = true;
+            }
+        }
+    }
+
+    public void equalPassword() {
+        String pw1 = register_pw1.getText().toString();
+        String pw2 = register_pw2.getText().toString();
+        if(pw1.equals(pw2)) {
+            if(register_pw2.getText().toString().equals("")) {
+                register_equal.setText("");
+                register_equal.setVisibility(View.GONE);
+            }
+            else {
+                register_equal.setVisibility(View.VISIBLE);
+                register_equal.setText("비밀번호가 일치합니다.");
+                register_equal.setTextColor(Color.BLUE);
+                equalPW = true;
+            }
+        }
+        else {
+            if(register_pw2.getText().toString().equals("")) {
+                register_equal.setText("");
+                register_equal.setVisibility(View.GONE);
+            }
+            else {
+                register_equal.setText("비밀번호가 일치하지 않습니다.");
+                register_equal.setTextColor(Color.RED);
+                equalPW = false;
+            }
+        }
     }
 
     // 아이디 중복 검사 버튼
     public void redundancyClick(View v) {
         String userID = register_id.getText().toString();
-        if(validate) {
+        if(validateID) {
 
         }
         if(userID.equals("")) {
@@ -211,7 +429,7 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 register_id.setEnabled(false);
-                                validate = true;
+                                validateID = true;
                             }
                         });
 
@@ -238,57 +456,13 @@ public class RegisterActivity extends AppCompatActivity {
         queue.add(validateRequest);
     }
 
-    // 프로필 사진 등록 버튼
-    public void profileImageClick(View v) {
-        album_open = true;
-        Intent intent = new Intent(RegisterActivity.this, GalleryActivity.class);
-        intent.putExtra("FromRegister",2);
-        startActivity(intent);
-
-        /*
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,REQUEST_IMAGE);*/
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-       /* if (intent.hasExtra("images")) {
-            changedImage = intent.getStringArrayListExtra("images").get(0);
-            Glide.with(getApplicationContext()).load(changedImage).into(profile_image);
-        }*/
         if(intent.hasExtra("cropImage")) {
             registerImage = intent.getStringExtra("cropImage");
             Glide.with(getApplicationContext()).load(registerImage).into(register_image);
         }
-    }
-
-    /*protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-
-        if(requestCode == REQUEST_IMAGE) {
-            if(resultCode == RESULT_OK) {
-                try {
-                    uri = data.getData();
-                    uriToPath = getRealPath(uri);
-                    Glide.with(getApplicationContext()).load(uri).into(register_image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }*/
-
-    private String getRealPath(Uri cUri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(cUri,projection,null,null,null);
-        cursor.moveToNext();
-        String path = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
-        Uri uri = Uri.fromFile(new File(path));
-        cursor.close();
-        return path;
     }
 
     public int uploadFile(String sourceFileUri) {

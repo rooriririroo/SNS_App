@@ -46,7 +46,9 @@ public class LoginActivity extends AppCompatActivity {
     String userPhone;
     String userNickname;
     String userImage;
+    String userGender;
     String userDate;
+
     EditText login_id;
     EditText login_pw;
     CheckBox login_check;
@@ -116,9 +118,8 @@ public class LoginActivity extends AppCompatActivity {
                             userImage = object.get("userImage").getAsString();
                             userDate = object.get("userDate").getAsString();
                             userBirth = object.get("userBirth").getAsString();
+                            userGender = object.get("userGender").getAsString();
 
-                            //saveUser(userID, userPassword, userName, userBirth, userPhone, userNickname,
-                                   // userImage, userDate);
                             Toast.makeText(getApplicationContext(),userName + "님 환영합니다.", Toast.LENGTH_SHORT).show();
 
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -129,6 +130,7 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("userPhone",userPhone);
                             intent.putExtra("userNickname",userNickname);
                             intent.putExtra("userImage",userImage);
+                            intent.putExtra("userGender",userGender);
                             intent.putExtra("userDate",userDate);
                             startActivity(intent);
                         }
@@ -161,6 +163,7 @@ public class LoginActivity extends AppCompatActivity {
             editor.putString("userPhone",userPhone);
             editor.putString("userNickname",userNickname);
             editor.putString("userImage",userImage);
+            editor.putString("userGender",userGender);
             editor.putString("userDate",userDate);
             editor.putBoolean("LoginChecked",true);
             editor.commit();
@@ -172,17 +175,4 @@ public class LoginActivity extends AppCompatActivity {
             editor.commit();
         }
     }
-
-    /*
-    public void saveUser(String userID, String userPassword, String userName, String userBirth, String userPhone,
-                         String userNickname, String userImage, String userDate) {
-        loginUserInfo.setUserID(userID);
-        loginUserInfo.setUserPassword(userPassword);
-        loginUserInfo.setUserName(userName);
-        loginUserInfo.setUserBirth(userBirth);
-        loginUserInfo.setUserPhone(userPhone);
-        loginUserInfo.setUserNickname(userNickname);
-        loginUserInfo.setUserImage(userImage);
-        loginUserInfo.setUserDate(userDate);
-    }*/
 }

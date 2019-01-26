@@ -3,14 +3,16 @@ package com.example.soyeonlee.myapplication12;
 public class CalendarListItem {
     private String calendarDate;
     private String calendarDay;
-    private String calendarName;
-    private String calendarText;
-    private String calendarBirth;
+    private String calendarTitle;
+    private String calendarTime;
+    private String calendarMap;
 
-    public CalendarListItem(String calendarDate, String calendarDay, String calendarName) {
+    public CalendarListItem(String calendarDate, String calendarDay, String calendarTitle, String calendarTime, String calendarMap) {
         this.calendarDate = calendarDate;
         this.calendarDay = calendarDay;
-        this.calendarName = calendarName;
+        this.calendarTitle = calendarTitle;
+        this.calendarTime = calendarTime;
+        this.calendarMap = calendarMap;
     }
 
     public String getCalendarDate() {
@@ -29,27 +31,27 @@ public class CalendarListItem {
         this.calendarDay = calendarDay;
     }
 
-    public String getCalendarName() {
-        return calendarName;
+    public String getCalendarTitle() {
+        return calendarTitle;
     }
 
-    public void setCalendarName(String calendarName) {
-        this.calendarName = calendarName;
+    public void setCalendarTitle(String calendarTitle) {
+        this.calendarTitle = calendarTitle;
     }
 
-    public String getCalendarText() {
-        return calendarText;
+    public String getCalendarTime() {
+        return calendarTime;
     }
 
-    public void setCalendarText(String calendarText) {
-        this.calendarText = calendarText;
+    public void setCalendarTime(String calendarTime) {
+        this.calendarTime = calendarTime;
     }
 
-    public String getCalendarBirth() {
-        return calendarBirth;
+    public String getCalendarMap() {
+        return calendarMap;
     }
 
-    public void setCalendarBirth(String calendarBirth) {
-        this.calendarBirth = calendarBirth;
+    public void setCalendarMap(String calendarMap) {
+        this.calendarMap = calendarMap;
     }
 }
