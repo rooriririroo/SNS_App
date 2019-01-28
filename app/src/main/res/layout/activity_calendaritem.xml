@@ -7,9 +7,8 @@
         android:id="@+id/calendaritem_linear1"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_centerVertical="true"
         android:orientation="vertical">
 
         <TextView
@@ -77,5 +76,13 @@
         android:layout_marginEnd="10dp"
         android:visibility="gone"
         android:drawableStart="@drawable/outline_cake_purple_18dp"/>
+
+    <View
+        android:layout_width="350dp"
+        android:layout_height="1dp"
+        android:layout_below="@+id/calendaritem_linear2"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="5dp"
+        android:background="#acacac"/>
 
 </RelativeLayout>

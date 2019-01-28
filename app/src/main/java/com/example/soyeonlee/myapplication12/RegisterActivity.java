@@ -342,8 +342,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                 RegisterRequest registerRequest = new RegisterRequest(userID, userPassword, userName, userBirth, userPhone,
                         userNickname, userImage, userGender, userDate, registerListener);
-                ScheduleRequest scheduleRequest = new ScheduleRequest(userName + " 생일","","",inputBirth,"","",
-                        "","없음","",scheduleListener);
+                ScheduleRequest scheduleRequest = new ScheduleRequest(userName + " 생일","","",userBirth,"","",
+                        "","반복 적용","없음","",scheduleListener);
                 RequestQueue queue = Volley.newRequestQueue(RegisterActivity.this);
                 queue.add(registerRequest);
                 queue.add(scheduleRequest);

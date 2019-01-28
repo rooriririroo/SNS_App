@@ -95,6 +95,39 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/schedule_repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="20dp"
+            android:drawableStart="@drawable/outline_repeat_black_18dp_small"
+            android:drawablePadding="15dp"
+            android:text="매년 반복"/>
+
+        <Switch
+            android:id="@+id/schedule_switchRepeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="350dp"
+        android:layout_height="1dp"
+        android:layout_below="@+id/calendaritem_linear2"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="5dp"
+        android:background="#888878"/>
+
+    <LinearLayout
         android:id="@+id/schedule_layoutMap"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

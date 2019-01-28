@@ -42,6 +42,7 @@ public class ScheduleActivity extends AppCompatActivity {
     TextView schedule_startTime;
     TextView schedule_endDate;
     TextView schedule_endTime;
+    Switch schedule_switchRepeat;
     TextView schedule_mapSet;
     Switch schedule_switchShare;
     TextView schedule_alarmSet;
@@ -58,11 +59,12 @@ public class ScheduleActivity extends AppCompatActivity {
     int iMonth;
     int iDay;
     String iWeek;
-    String inputStartDate;
-    String inputEndDate;
+    String inputStartDate = "";
+    String inputEndDate = "";
 
     boolean isShared = false;
     boolean isAllday = false;
+    boolean isRepeat = false;
     int REQUEST_MAP = 1000;
 
     ArrayList<String> maps = new ArrayList<>();
@@ -116,29 +118,33 @@ public class ScheduleActivity extends AppCompatActivity {
 
         String startDate = "";
         if(iYear!=0) {
+            //startDate = String.format(Locale.KOREA,"%d.%d.%d.",iYear,iMonth,iDay) + " (" + iWeek + ")";
             startDate = iYear + "." + iMonth + "." + iDay + "." + " (" + iWeek + ")";
-            inputStartDate = iYear + "." + iMonth + "." + iDay + "." + " (" + iWeek + ")";
+            inputStartDate = iYear + "년 " + iMonth + "월 " + iDay + "일";
+            //inputStartDate = String.format(Locale.KOREA,"%d년 %d월 %d일",iYear,iMonth,iDay);
         }
         else {
+            //startDate = String.format(Locale.KOREA,"%d.%d.%d.",cYear,cMonth,cDay)
+             //       + " (" + getWeek(cYear, cMonth-1, cDay) + ")";
+            //inputStartDate = String.format(Locale.KOREA,"%d년 %d월 %d일",cYear,cMonth,cDay);
             startDate = String.valueOf(cYear) + "." + String.valueOf(cMonth) + "."
                     + String.valueOf(cDay) + "." + " (" + getWeek(cYear, cMonth-1, cDay) + ")";
-            inputStartDate = String.valueOf(cYear) + "." + String.valueOf(cMonth) + "."
-                    + String.valueOf(cDay) + "." + " (" + getWeek(cYear, cMonth-1, cDay) + ")";
+            inputStartDate = String.valueOf(cYear) + "년 " + String.valueOf(cMonth) + "월 " + String.valueOf(cDay) + "일";
         }
         schedule_startDate = findViewById(R.id.schedule_startDate);
         schedule_startDate.setText(startDate);
         schedule_startDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(ScheduleActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                DatePickerDialog datePickerDialog = new DatePickerDialog(ScheduleActivity.this, android.app.AlertDialog.THEME_HOLO_LIGHT,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                 try{
                                     String date = String.format(Locale.KOREA,"%d.%d.%d.",year,month+1,dayOfMonth)
                                             + "  ("+getWeek(year,month,dayOfMonth)+")";
-                                    inputStartDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth)
-                                            + "  ("+getWeek(year,month,dayOfMonth)+")";
+                                    inputStartDate = String.valueOf(year) + "년 " + String.valueOf(month+1) + "월 " + String.valueOf(dayOfMonth) + "일";
+                                    //inputStartDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth);
                                     schedule_startDate.setText(date);
                                 }
                                 catch (Exception e) {
@@ -163,7 +169,7 @@ public class ScheduleActivity extends AppCompatActivity {
         schedule_startTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final TimePickerDialog timePickerDialog = new TimePickerDialog(ScheduleActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                final TimePickerDialog timePickerDialog = new TimePickerDialog(ScheduleActivity.this, android.app.AlertDialog.THEME_HOLO_LIGHT,
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -200,15 +206,15 @@ public class ScheduleActivity extends AppCompatActivity {
         schedule_endDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(ScheduleActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                DatePickerDialog datePickerDialog = new DatePickerDialog(ScheduleActivity.this, android.app.AlertDialog.THEME_HOLO_LIGHT,
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                 try{
                                     String date = String.format(Locale.KOREA,"%d.%d.%d.",year,month+1,dayOfMonth)
                                             + " ("+getWeek(year,month,dayOfMonth)+")";
-                                    inputEndDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth)
-                                            + " ("+getWeek(year,month,dayOfMonth)+")";
+                                    inputEndDate = String.valueOf(year) + "년 " + String.valueOf(month+1) + "월 " + String.valueOf(dayOfMonth) + "일";
+                                    //inputEndDate = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth);
                                     schedule_endDate.setText(date);
                                 }
                                 catch (Exception e) {
@@ -225,7 +231,7 @@ public class ScheduleActivity extends AppCompatActivity {
         schedule_endTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(ScheduleActivity.this, android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                TimePickerDialog timePickerDialog = new TimePickerDialog(ScheduleActivity.this, android.app.AlertDialog.THEME_HOLO_LIGHT,
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -254,6 +260,17 @@ public class ScheduleActivity extends AppCompatActivity {
             }
         });
 
+        schedule_switchRepeat = findViewById(R.id.schedule_switchRepeat);
+        schedule_switchRepeat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
+                    isShared = true;
+                else
+                    isShared = false;
+            }
+        });
+
         schedule_mapSet = findViewById(R.id.schedule_mapSet);
         schedule_mapSet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -269,9 +286,9 @@ public class ScheduleActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked)
-                    isShared = true;
+                    isRepeat = true;
                 else
-                    isShared = false;
+                    isRepeat = false;
             }
         });
 
@@ -346,18 +363,21 @@ public class ScheduleActivity extends AppCompatActivity {
 
                 }
                 else {
-
                     String title = schedule_title.getText().toString();
                     String sub = schedule_sub.getText().toString();
-                    String startDate = schedule_startDate.getText().toString();
+                    String startDate = inputStartDate;
                     String startTime = schedule_startTime.getText().toString();
-                    String endDate = schedule_endDate.getText().toString();
+                    String endDate = inputEndDate;
                     String endTime = schedule_endTime.getText().toString();
                     String allDay = "";
                     if(isAllday) {
                         allDay = "하루종일";
                         startTime = "";
                         endTime = "";
+                    }
+                    String repeated = "";
+                    if(isRepeat) {
+                        repeated = "반복 적용";
                     }
                     String alarm = schedule_alarmSet.getText().toString();
                     String map = maps.toString();
@@ -384,7 +404,7 @@ public class ScheduleActivity extends AppCompatActivity {
                     };
 
                     ScheduleRequest scheduleRequest = new ScheduleRequest(title, sub, allDay, startDate, startTime,
-                            endDate, endTime, alarm, map, responseListener);
+                            endDate, endTime, repeated, alarm, map, responseListener);
                     RequestQueue queue = Volley.newRequestQueue(ScheduleActivity.this);
                     queue.add(scheduleRequest);
                 }

@@ -178,8 +178,4 @@ public class HomeFragment extends Fragment {
         RequestQueue queue = Volley.newRequestQueue(getContext());
         queue.add(loadWritingRequest);
     }
-
-    public void delete_values(int p) {
-
-    }
 }

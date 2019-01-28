@@ -13,7 +13,7 @@ public class ScheduleRequest extends StringRequest {
     private Map<String, String> parameters;
 
     public ScheduleRequest(String title, String sub, String allDay, String startDate, String startTime,
-                           String endDate, String endTime, String alarm, String map, Response.Listener<String> listener) {
+                           String endDate, String endTime, String repeated, String alarm, String map, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
 
         parameters = new HashMap<>();
@@ -24,6 +24,7 @@ public class ScheduleRequest extends StringRequest {
         parameters.put("startTime",startTime);
         parameters.put("endDate",endDate);
         parameters.put("endTime",endTime);
+        parameters.put("repeated",repeated);
         parameters.put("alarm",alarm);
         parameters.put("map",map);
     }
