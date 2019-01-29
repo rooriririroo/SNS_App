@@ -12,9 +12,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -54,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     CheckBox login_check;
     boolean loginChecked;
     public SharedPreferences loginUserInfo;
-    //LoginUserInfo loginUserInfo = new LoginUserInfo();
+    public SharedPreferences autoLoginInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,19 +68,21 @@ public class LoginActivity extends AppCompatActivity {
         else if(Build.VERSION.SDK_INT < 21)
             requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        loginUserInfo = getSharedPreferences("loginUserInfo", Activity.MODE_PRIVATE);
+        autoLoginInfo = getSharedPreferences("autoLoginInfo",Activity.MODE_PRIVATE);
+
         login_id = findViewById(R.id.login_id);
         login_id.setPrivateImeOptions("defaultInputmode=english;");
         login_pw = findViewById(R.id.login_pw);
         login_check = findViewById(R.id.login_check);
 
-        loginUserInfo = getSharedPreferences("loginUserInfo", Activity.MODE_PRIVATE);
-        loginChecked = loginUserInfo.getBoolean("LoginChecked",false);
+        loginChecked = autoLoginInfo.getBoolean("AutoLoginChecked",false);
         if(loginChecked) {
-            login_id.setText(loginUserInfo.getString("loginID",""));
-            login_pw.setText(loginUserInfo.getString("loginPW",""));
+            login_id.setText(autoLoginInfo.getString("loginID",""));
+            login_pw.setText(autoLoginInfo.getString("loginPW",""));
             login_check.setChecked(true);
         }
-        if(!loginUserInfo.getString("loginID","").equals(""))
+        if(!autoLoginInfo.getString("loginID","").equals(""))
             login_pw.requestFocus();
 
     }
@@ -87,15 +91,6 @@ public class LoginActivity extends AppCompatActivity {
 
         userID = login_id.getText().toString();
         userPassword = login_pw.getText().toString();
-
-        /*
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        if(telephonyManager.getDeviceId() != null) {
-            getDeviceID = telephonyManager.getDeviceId();
-        }
-        else {
-            getDeviceID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        }*/
 
         Response.Listener<String> responseListener = new Response.Listener<String>() {
             @Override
@@ -119,6 +114,9 @@ public class LoginActivity extends AppCompatActivity {
                             userDate = object.get("userDate").getAsString();
                             userBirth = object.get("userBirth").getAsString();
                             userGender = object.get("userGender").getAsString();
+
+                            saveLoginInfo();
+                            saveAutoLoginInfo();
 
                             Toast.makeText(getApplicationContext(),userName + "님 환영합니다.", Toast.LENGTH_SHORT).show();
 
@@ -153,26 +151,40 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onStop() {
         super.onStop();
+        Log.d("[Login]=>","onStop");
+    }
+
+    public void saveAutoLoginInfo() {
         if(login_check.isChecked()) {
-            loginUserInfo = getSharedPreferences("loginUserInfo",Activity.MODE_PRIVATE);
-            SharedPreferences.Editor editor = loginUserInfo.edit();
-            editor.putString("userID",userID);
-            editor.putString("userPassword",userPassword);
-            editor.putString("userName",userName);
-            editor.putString("userBirth",userBirth);
-            editor.putString("userPhone",userPhone);
-            editor.putString("userNickname",userNickname);
-            editor.putString("userImage",userImage);
-            editor.putString("userGender",userGender);
-            editor.putString("userDate",userDate);
-            editor.putBoolean("LoginChecked",true);
-            editor.commit();
+            SharedPreferences.Editor editor = autoLoginInfo.edit();
+            editor.putString("loginID",userID);
+            editor.putString("loginPW",userPassword);
+            editor.putBoolean("AutoLoginChecked",true);
+            editor.apply();
         }
         else {
-            loginUserInfo = getSharedPreferences("settings",Activity.MODE_PRIVATE);
-            SharedPreferences.Editor editor = loginUserInfo.edit();
+            SharedPreferences.Editor editor = autoLoginInfo.edit();
             editor.clear();
-            editor.commit();
+            editor.apply();
         }
+    }
+
+    public void saveLoginInfo() {
+        SharedPreferences.Editor editor = loginUserInfo.edit();
+        editor.putString("userID",userID);
+        editor.putString("userPassword",userPassword);
+        editor.putString("userName",userName);
+        editor.putString("userBirth",userBirth);
+        editor.putString("userPhone",userPhone);
+        editor.putString("userNickname",userNickname);
+        editor.putString("userImage",userImage);
+        editor.putString("userGender",userGender);
+        editor.putString("userDate",userDate);
+
+        if(login_check.isChecked())
+            editor.putBoolean("LoginChecked",true);
+        else
+            editor.putBoolean("LoginChecked",false);
+        editor.apply();
     }
 }

@@ -92,11 +92,11 @@ public class ProfileChangeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        String userImage = intent.getStringExtra("userImage");
-        String userName = intent.getStringExtra("userName");
-        String userNickname = intent.getStringExtra("userNickname");
-        String userBirth = intent.getStringExtra("userBirth");
-        String userPhone = intent.getStringExtra("userPhone");
+        String userImage = loginUserInfo.getString("userImage","");
+        String userName = loginUserInfo.getString("userName","");
+        String userNickname = loginUserInfo.getString("userNickname","");
+        String userBirth = loginUserInfo.getString("userBirth","");
+        String userPhone = loginUserInfo.getString("userPhone","");
         String userPassword = loginUserInfo.getString("userPassword","");
 
         final CharSequence[] items = {"변경","삭제"};
@@ -277,7 +277,13 @@ public class ProfileChangeActivity extends AppCompatActivity {
                 }
 
                 if(!validatePW || !equalPW) {
-                    Toast.makeText(getApplicationContext(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show();
+                    if(profile_pw1.getText().toString().equals("")) {
+                        validatePW = true;
+                        equalPW = true;
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 if(userName.equals("")) {
@@ -290,15 +296,22 @@ public class ProfileChangeActivity extends AppCompatActivity {
 
                 if(validatePW && equalPW && !userName.equals("") && !userPhone.equals("")) {
 
-                    new Thread(new Runnable() {
-                        public void run() {
-                            runOnUiThread(new Runnable() {
-                                public void run() {
-                                }
-                            });
-                            uploadFile(changedImage);
-                        }
-                    }).start();
+                    if(profile_pw1.getText().toString().equals("")) {
+                        userPassword = loginUserInfo.getString("userPassword",null);
+                    }
+
+                    if(isModify) {
+
+                        new Thread(new Runnable() {
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    public void run() {
+                                    }
+                                });
+                                uploadFile(changedImage);
+                            }
+                        }).start();
+                    }
 
                     Response.Listener<String> responseListener = new Response.Listener<String>() {
                         @Override
@@ -323,8 +336,6 @@ public class ProfileChangeActivity extends AppCompatActivity {
                             userPhone, userNickname, userImage, responseListener);
                     RequestQueue queue = Volley.newRequestQueue(ProfileChangeActivity.this);
                     queue.add(profileChangeRequest);
-
-                    Toast.makeText(getApplicationContext(), imageForDB, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -352,9 +363,11 @@ public class ProfileChangeActivity extends AppCompatActivity {
     public void validatePassword() {
         String pattern = "^[a-zA-Z0-9!@.#$%^&*?_~+]{8,20}$";
         Matcher matcher = Pattern.compile(pattern).matcher(profile_pw1.getText().toString());
+
         if(!matcher.matches()) {
-            if(profile_pw1.getText().toString().equals(""))
+            if(profile_pw1.getText().toString().equals("")) {
                 profile_notice.setText("");
+            }
             else {
                 profile_notice.setText("올바르지 않은 형식입니다.");
                 profile_notice.setTextColor(Color.RED);
@@ -362,8 +375,9 @@ public class ProfileChangeActivity extends AppCompatActivity {
             }
         }
         else {
-            if(profile_pw1.getText().toString().equals(""))
+            if(profile_pw1.getText().toString().equals("")) {
                 profile_notice.setText("");
+            }
             else {
                 profile_notice.setText("사용 가능한 비밀번호입니다.");
                 profile_notice.setTextColor(Color.BLUE);

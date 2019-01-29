@@ -327,11 +327,11 @@ public class RegisterActivity extends AppCompatActivity {
                             boolean success = jsonResponse.getBoolean("success");
 
                             if(success) {
-                                Toast.makeText(getApplicationContext(),"가입완료",Toast.LENGTH_SHORT).show();
+
                                 finish();
                             }
                             else {
-                                Toast.makeText(getApplicationContext(),"가입실패",Toast.LENGTH_SHORT).show();
+
                             }
                         }
                         catch (Exception e) {

@@ -4,41 +4,221 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/myinfo_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/ir"/>
-
     <TextView
-        android:id="@+id/myinfo_name"
-        android:layout_width="wrap_content"
+        android:id="@+id/myinfo_profile"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:drawableEnd="@drawable/outline_keyboard_arrow_right_white_18dp"
+        android:drawableTint="#ababab"
+        android:text="프로필 설정"
+        android:textSize="18sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
         android:layout_marginTop="10dp"
-        android:layout_gravity="center_horizontal"
-        android:text="어피치"/>
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#ababab"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/myinfo_alarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="15dp"
+            android:layout_marginStart="10dp"
+            android:text="알림 설정"
+            android:textSize="18sp"/>
+
+        <Switch
+            android:id="@+id/myinfo_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#ababab"/>
+
+    <LinearLayout
+        android:id="@+id/myinfo_alarmLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/myinfo_writingLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/myinfo_writingAlarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="새글 알림"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/myinfo_writingState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:layout_marginTop="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:drawableEnd="@drawable/outline_keyboard_arrow_right_white_18dp"
+                android:drawableTint="#ababab"
+                android:drawablePadding="5dp"
+                android:text="모든 글"
+                android:textSize="18sp"
+                android:textColor="#ababab"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="#ababab"/>
+
+        <LinearLayout
+            android:id="@+id/myinfo_commentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/myinfo_commentAlarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="댓글 알림"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/myinfo_commentState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:layout_marginTop="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:drawableEnd="@drawable/outline_keyboard_arrow_right_white_18dp"
+                android:drawableTint="#ababab"
+                android:drawablePadding="5dp"
+                android:text="모든 글"
+                android:textSize="18sp"
+                android:textColor="#ababab"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="#ababab"/>
+
+        <LinearLayout
+            android:id="@+id/myinfo_scheduleLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/myinfo_scheduleAlarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="일정 알림"
+            android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/myinfo_scheduleState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:layout_marginTop="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:drawableEnd="@drawable/outline_keyboard_arrow_right_white_18dp"
+                android:drawableTint="#ababab"
+                android:drawablePadding="5dp"
+                android:text="모든 글"
+                android:textSize="18sp"
+                android:textColor="#ababab"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="#ababab"/>
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/myinfo_nickname"
-        android:layout_width="wrap_content"
+        android:id="@+id/myinfo_logout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="14학번 생명시스템" />
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:drawableEnd="@drawable/outline_keyboard_arrow_right_white_18dp"
+        android:drawableTint="#ababab"
+        android:text="로그아웃"
+        android:textSize="18sp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#ababab"/>
 
     <TextView
-        android:id="@+id/myinfo_birth"
-        android:layout_width="wrap_content"
+        android:id="@+id/myinfo_exit"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="03월23일"/>
-
-    <TextView
-        android:id="@+id/myinfo_phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="010-2871-1010"/>
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:drawableEnd="@drawable/outline_keyboard_arrow_right_white_18dp"
+        android:drawableTint="#ababab"
+        android:text="회원 탈퇴"
+        android:textSize="18sp"/>
 
 </LinearLayout>
