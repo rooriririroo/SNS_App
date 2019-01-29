@@ -62,6 +62,8 @@ public class HomeFragment extends Fragment {
 
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_home,container,false);
 
+        Log.d("[Home]=>", "onCreateView");
+
         listItemArrayList = new ArrayList<ListItem>();
         listView = (ListView) rootView.findViewById(R.id.listView);
         adapter = new ListItemAdapter(getContext(),listItemArrayList);
@@ -177,5 +179,29 @@ public class HomeFragment extends Fragment {
         LoadWritingRequest loadWritingRequest = new LoadWritingRequest(responseListener);
         RequestQueue queue = Volley.newRequestQueue(getContext());
         queue.add(loadWritingRequest);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("[Home]=>", "onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("[Home]=>", "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("[Home]=>", "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("[Home]=>", "onStop");
     }
 }

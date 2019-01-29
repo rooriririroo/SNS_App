@@ -11,12 +11,13 @@ public class ProfileChangeRequest extends StringRequest {
     final static private String URL = IPAddress.IPAddress + "/update_profile.php";
     private Map<String, String> parameters;
 
-    public ProfileChangeRequest(String userID, String userName, String userBirth, String userPhone,
+    public ProfileChangeRequest(String userID, String userPassword, String userName, String userBirth, String userPhone,
                            String userNickname, String userImage, Response.Listener<String> listener) {
         super(Method.POST, URL, listener, null);
 
         parameters = new HashMap<>();
         parameters.put("userID", userID);
+        parameters.put("userPassword",userPassword);
         parameters.put("userName", userName);
         parameters.put("userBirth", userBirth);
         parameters.put("userPhone", userPhone);

@@ -6,16 +6,21 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -35,9 +40,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProfileChangeActivity extends AppCompatActivity {
 
@@ -46,17 +55,27 @@ public class ProfileChangeActivity extends AppCompatActivity {
     EditText profile_nickname;
     TextView profile_birth;
     EditText profile_phone;
+    TextView profile_hide;
+    EditText profile_id;
+    EditText profile_pw1;
+    TextView profile_notice;
+    EditText profile_pw2;
+    TextView profile_equal;
     Button profile_save;
 
     SharedPreferences loginUserInfo;
 
     boolean isModify = false;
     boolean isDelete = false;
+    boolean validatePW = false;
+    boolean equalPW = false;
+    int hideCount = 0;
 
     String changedImage = "";
     String uploadServerPath = null;
     String uploadServerUri = null;
     int serverResponseCode = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +97,7 @@ public class ProfileChangeActivity extends AppCompatActivity {
         String userNickname = intent.getStringExtra("userNickname");
         String userBirth = intent.getStringExtra("userBirth");
         String userPhone = intent.getStringExtra("userPhone");
+        String userPassword = loginUserInfo.getString("userPassword","");
 
         final CharSequence[] items = {"변경","삭제"};
         profile_image = findViewById(R.id.profile_image);
@@ -119,11 +139,11 @@ public class ProfileChangeActivity extends AppCompatActivity {
         String findMonth = userBirth.substring(yearID+1);
 
         int monthID = findMonth.indexOf("월");
-        final String sMonth = findMonth.substring(0,monthID);
+        final String sMonth = findMonth.substring(1,monthID);
         String findDay = findMonth.substring(monthID+1);
 
         int dayID = findDay.indexOf("일");
-        final String sDay = findDay.substring(0,dayID);
+        final String sDay = findDay.substring(1,dayID);
 
         profile_birth = findViewById(R.id.profile_birth);
         profile_birth.setText(userBirth);
@@ -137,7 +157,7 @@ public class ProfileChangeActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         try{
-                            String birth = String.format(Locale.KOREA,"%d년%02d월%02d일",year,month+1,dayOfMonth);
+                            String birth = String.format(Locale.KOREA,"%d년 %d월 %d일",year,month+1,dayOfMonth);
                             //String birth = String.valueOf(year) + "년" + String.valueOf(month+1) + "월" +
                                     //String.valueOf(dayOfMonth) + "일";
                             profile_birth.setText(birth);
@@ -152,7 +172,77 @@ public class ProfileChangeActivity extends AppCompatActivity {
         });
 
         profile_phone = findViewById(R.id.profile_phone);
+        profile_phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         profile_phone.setText(userPhone);
+
+        profile_hide = findViewById(R.id.profile_hide);
+        profile_hide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideCount++;
+                if(hideCount%2 != 0) {
+                    profile_hide.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.outline_keyboard_arrow_up_white_18dp,0);
+                    profile_hide.setCompoundDrawableTintList(ColorStateList.valueOf(Color.rgb(136,135,136)));
+                    profile_id.setVisibility(View.VISIBLE);
+                    profile_pw1.setVisibility(View.VISIBLE);
+                    profile_notice.setVisibility(View.VISIBLE);
+                    profile_pw2.setVisibility(View.VISIBLE);
+                    profile_equal.setVisibility(View.VISIBLE);
+                }
+                else {
+                    profile_hide.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.outline_keyboard_arrow_down_white_18dp,0);
+                    profile_hide.setCompoundDrawableTintList(ColorStateList.valueOf(Color.rgb(136,135,136)));
+                    profile_id.setVisibility(View.GONE);
+                    profile_pw1.setVisibility(View.GONE);
+                    profile_notice.setVisibility(View.GONE);
+                    profile_pw2.setVisibility(View.GONE);
+                    profile_equal.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        profile_id = findViewById(R.id.profile_id);
+        profile_id.setText(loginUserInfo.getString("userID",""));
+        profile_id.setEnabled(false);
+
+        profile_pw1 = findViewById(R.id.profile_pw1);
+        profile_pw1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                profile_notice.setText("");
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                validatePassword();
+                equalPassword();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        profile_notice = findViewById(R.id.profile_notice);
+
+        profile_pw2 = findViewById(R.id.profile_pw2);
+        profile_pw2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                equalPassword();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        profile_equal = findViewById(R.id.profile_equal);
 
         profile_save = findViewById(R.id.profile_save);
         profile_save.setOnClickListener(new View.OnClickListener() {
@@ -167,12 +257,14 @@ public class ProfileChangeActivity extends AppCompatActivity {
                 String userNickname = profile_nickname.getText().toString();
                 String userBirth = profile_birth.getText().toString();
                 String userPhone = profile_phone.getText().toString();
-                String userImage = "";
+                String userImage = loginUserInfo.getString("userImage",null);
+                String userPassword = profile_pw1.getText().toString();
 
-                loginUserInfo.edit().putString("userName",profile_name.getText().toString()).apply();
-                loginUserInfo.edit().putString("userNickname",profile_nickname.getText().toString()).apply();
-                loginUserInfo.edit().putString("userBirth",profile_birth.getText().toString()).apply();
-                loginUserInfo.edit().putString("userPhone",profile_phone.getText().toString()).apply();
+                loginUserInfo.edit().putString("userName",userName).apply();
+                loginUserInfo.edit().putString("userNickname",userNickname).apply();
+                loginUserInfo.edit().putString("userBirth",userBirth).apply();
+                loginUserInfo.edit().putString("userPhone",userPhone).apply();
+                //loginUserInfo.edit().putString("userPassword",userPassword).apply();
 
                 if(isModify) {
                     loginUserInfo.edit().putString("userImage",imageForDB).apply();
@@ -184,43 +276,56 @@ public class ProfileChangeActivity extends AppCompatActivity {
                     userImage = "";
                 }
 
-                new Thread(new Runnable() {
-                    public void run() {
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                            }
-                        });
-                        uploadFile(changedImage);
-                    }
-                }).start();
+                if(!validatePW || !equalPW) {
+                    Toast.makeText(getApplicationContext(),"비밀번호를 확인해주세요.",Toast.LENGTH_SHORT).show();
+                }
 
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try{
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean success = jsonResponse.getBoolean("success");
+                if(userName.equals("")) {
+                    Toast.makeText(getApplicationContext(),"이름 입력은 필수입니다.",Toast.LENGTH_SHORT).show();
+                }
 
-                            if(success) {
-                                Toast.makeText(getApplicationContext(),"변경 완료",Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                            else {
-                                Toast.makeText(getApplicationContext(),"변경 실패",Toast.LENGTH_SHORT).show();
+                if(userPhone.equals("")) {
+                    Toast.makeText(getApplicationContext(),"핸드폰 번호 입력은 필수입니다.",Toast.LENGTH_SHORT).show();
+                }
+
+                if(validatePW && equalPW && !userName.equals("") && !userPhone.equals("")) {
+
+                    new Thread(new Runnable() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                }
+                            });
+                            uploadFile(changedImage);
+                        }
+                    }).start();
+
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                boolean success = jsonResponse.getBoolean("success");
+
+                                if (success) {
+                                    Toast.makeText(getApplicationContext(), "변경 완료", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "변경 실패", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
+                    };
 
-                ProfileChangeRequest profileChangeRequest = new ProfileChangeRequest(userID, userName, userBirth,
-                        userPhone, userNickname, userImage, responseListener);
-                RequestQueue queue = Volley.newRequestQueue(ProfileChangeActivity.this);
-                queue.add(profileChangeRequest);
+                    ProfileChangeRequest profileChangeRequest = new ProfileChangeRequest(userID, userPassword, userName, userBirth,
+                            userPhone, userNickname, userImage, responseListener);
+                    RequestQueue queue = Volley.newRequestQueue(ProfileChangeActivity.this);
+                    queue.add(profileChangeRequest);
 
-                Toast.makeText(getApplicationContext(),imageForDB,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), imageForDB, Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -241,6 +346,57 @@ public class ProfileChangeActivity extends AppCompatActivity {
         if(intent.hasExtra("cropImage")) {
             changedImage = intent.getStringExtra("cropImage");
             Glide.with(getApplicationContext()).load(changedImage).into(profile_image);
+        }
+    }
+
+    public void validatePassword() {
+        String pattern = "^[a-zA-Z0-9!@.#$%^&*?_~+]{8,20}$";
+        Matcher matcher = Pattern.compile(pattern).matcher(profile_pw1.getText().toString());
+        if(!matcher.matches()) {
+            if(profile_pw1.getText().toString().equals(""))
+                profile_notice.setText("");
+            else {
+                profile_notice.setText("올바르지 않은 형식입니다.");
+                profile_notice.setTextColor(Color.RED);
+                validatePW = false;
+            }
+        }
+        else {
+            if(profile_pw1.getText().toString().equals(""))
+                profile_notice.setText("");
+            else {
+                profile_notice.setText("사용 가능한 비밀번호입니다.");
+                profile_notice.setTextColor(Color.BLUE);
+                validatePW = true;
+            }
+        }
+    }
+
+    public void equalPassword() {
+        String pw1 = profile_pw1.getText().toString();
+        String pw2 = profile_pw2.getText().toString();
+        if(pw1.equals(pw2)) {
+            if(profile_pw2.getText().toString().equals("")) {
+                profile_equal.setText("");
+                profile_equal.setVisibility(View.GONE);
+            }
+            else {
+                profile_equal.setVisibility(View.VISIBLE);
+                profile_equal.setText("비밀번호가 일치합니다.");
+                profile_equal.setTextColor(Color.BLUE);
+                equalPW = true;
+            }
+        }
+        else {
+            if(profile_pw2.getText().toString().equals("")) {
+                profile_equal.setText("");
+                profile_equal.setVisibility(View.GONE);
+            }
+            else {
+                profile_equal.setText("비밀번호가 일치하지 않습니다.");
+                profile_equal.setTextColor(Color.RED);
+                equalPW = false;
+            }
         }
     }
 

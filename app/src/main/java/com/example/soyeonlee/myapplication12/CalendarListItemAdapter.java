@@ -71,6 +71,11 @@ public class CalendarListItemAdapter extends BaseAdapter {
             viewHolder.calendarMap.setVisibility(View.GONE);
             viewHolder.calendarIcon.setVisibility(View.VISIBLE);
         }
+        else {
+            viewHolder.calendarTime.setVisibility(View.VISIBLE);
+            viewHolder.calendarMap.setVisibility(View.VISIBLE);
+            viewHolder.calendarIcon.setVisibility(View.GONE);
+        }
         viewHolder.calendarTime.setText(calendarListItemArrayList.get(position).getCalendarTime());
         viewHolder.calendarMap.setText(calendarListItemArrayList.get(position).getCalendarMap());
 

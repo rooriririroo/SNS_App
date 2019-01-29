@@ -42,4 +42,5 @@ dependencies {
     implementation 'com.felipecsl.asymmetricgridview:library:2.0.1'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
     implementation 'com.prolificinteractive:material-calendarview:1.4.3'
+    implementation 'com.baoyz.pullrefreshlayout:library:1.2.0'
 }

@@ -50,9 +50,12 @@ public class CalendarFragment extends Fragment {
     int selectMonth;
     int selectDay;
 
+    // 현재 년도,월,일 저장하기 위한 변수
     int year;
     int month;
     int day;
+
+    int currentMonth; // 일정 추가 내용 바로 적용하기 위한 변수
 
     String mapName = "";
     String mapAddress = "";
@@ -60,6 +63,8 @@ public class CalendarFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_calendar,container,false);
+
+        Log.d("[Calendar]=>", "onCreateView");
 
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
@@ -92,6 +97,7 @@ public class CalendarFragment extends Fragment {
                         && String.valueOf(date.getDay()).equals(String.valueOf(day))) {
                     calendarView.setDateSelected(CalendarDay.from(year,month,day),true);
                 }
+                currentMonth = date.getMonth();
 
                 final String strDate = String.format(Locale.KOREA,"%d월 %d일",date.getMonth()+1,date.getDay());
                 calendarListItemArrayList.clear();
@@ -156,7 +162,7 @@ public class CalendarFragment extends Fragment {
                                     int dayID = findDay.indexOf("일");
                                     final String sDay = findDay.substring(1,dayID);
 
-                                    calendarListItemArrayList.add(new CalendarListItem(sDay,getWeek(year,Integer.valueOf(sMonth),Integer.valueOf(sDay)) + "요일",
+                                    calendarListItemArrayList.add(new CalendarListItem(sDay,getWeek(year,Integer.valueOf(sMonth)-1,Integer.valueOf(sDay)) + "요일",
                                             title,startTime + endTime, mapName, sub, allDay, startDate, startTime, endDate, endTime, repeated, alarm, mapAddress));
                                 }
                                 adapter.notifyDataSetChanged();
@@ -189,6 +195,31 @@ public class CalendarFragment extends Fragment {
         setHasOptionsMenu(true);
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("[Calendar]=>", "onStart");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        load_schedule(year,currentMonth);
+        Log.d("[Calendar]=>", "onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("[Calendar]=>", "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("[Calendar]=>", "onStop");
     }
 
     @Override
@@ -270,8 +301,8 @@ public class CalendarFragment extends Fragment {
 
 
                         calendar.set(year,month,Integer.valueOf(sDay));
-                        Log.d("[Current Calendar]=>",String.valueOf(year)+String.valueOf(month)+sDay);
-                        Log.d("[Database Calendar]=>",sYear + sMonth + sDay);
+                        //Log.d("[Current Calendar]=>",String.valueOf(year)+String.valueOf(month)+sDay);
+                        //Log.d("[Database Calendar]=>",sYear + sMonth + sDay);
 
                         if((month+1) == Integer.valueOf(sMonth)) {
                             for(int j = 0; j<calendar.getActualMaximum(Calendar.DAY_OF_MONTH); j++) {

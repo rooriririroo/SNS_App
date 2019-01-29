@@ -21,17 +21,24 @@
     <EditText
         android:id="@+id/login_id"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="80dp"
         android:layout_gravity="center_horizontal"
+        android:background="@drawable/edittext_outline"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:ems="9"
-        android:hint="ID"/>
+        android:hint="ID" />
 
     <EditText
         android:id="@+id/login_pw"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
         android:layout_gravity="center_horizontal"
+        android:background="@drawable/edittext_outline"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:ems="9"
         android:hint="PW"
         android:inputType="textPassword"/>
@@ -42,7 +49,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="80dp"
         android:layout_gravity="end"
-        android:text="자동로그인"/>
+        android:buttonTint="#ffffff"
+        android:text="자동로그인"
+        android:textColor="#ffffff"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -60,7 +69,7 @@
             android:layout_gravity="center_horizontal"
             android:background="#ffffff"
             android:text="로그인"
-            android:textColor="#FFB471"/>
+            android:textColor="#9c27b0"/>
 
         <Button
             android:id="@+id/register_button"
@@ -72,7 +81,7 @@
             android:layout_gravity="center_horizontal"
             android:background="#ffffff"
             android:text="회원가입"
-            android:textColor="#FFB471"/>
+            android:textColor="#9c27b0"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -1,66 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".ProfileChangeActivity">
 
-    <ImageView
-        android:id="@+id/profile_image"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="70dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/ir" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/profile_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:ems="15"
-        android:hint="이름" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/profile_nickname"
+            <ImageView
+                android:id="@+id/profile_image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="60dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ir" />
+
+            <EditText
+                android:id="@+id/profile_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:ems="15"
+                android:hint="이름" />
+
+            <EditText
+                android:id="@+id/profile_nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:ems="15"
+                android:hint="설명" />
+
+            <TextView
+                android:id="@+id/profile_birth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="10dp"
+                android:ems="15"
+                android:hint="생일"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/profile_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:inputType="phone"
+                android:ems="15"
+                android:hint="번호" />
+
+    <!--EditText
+        android:id="@+id/profile_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
         android:ems="15"
-        android:hint="설명" />
+        android:hint="비밀번호" /!-->
 
-    <TextView
-        android:id="@+id/profile_birth"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginStart="3dp"
-        android:layout_marginTop="10dp"
-        android:ems="15"
-        android:hint="생일"
-        android:textSize="18sp" />
 
-    <EditText
-        android:id="@+id/profile_phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:ems="15"
-        android:hint="번호" />
+            <TextView
+                android:id="@+id/profile_hide"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:drawableEnd="@drawable/outline_keyboard_arrow_down_white_18dp"
+                android:drawableTint="#888788"
+                android:text="계정 정보"
+                android:textSize="18sp"
+                android:textColor="#000000"/>
 
-    <Button
-        android:id="@+id/profile_save"
-        android:layout_width="320dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:background="#FFB471"
-        android:text="완료" />
+            <EditText
+                android:id="@+id/profile_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:visibility="gone"
+                android:ems="15"
+                android:hint="아이디"/>
 
-</LinearLayout>
+            <EditText
+                android:id="@+id/profile_pw1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:visibility="gone"
+                android:ems="15"
+                android:hint="비밀번호"/>
+            <TextView
+                android:id="@+id/profile_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:visibility="gone"
+                android:hint="영어,숫자,특수문자 포함 8자에서 20자 사이 비밀번호만 가능합니다."
+                android:textSize="10sp" />
+
+            <EditText
+                android:id="@+id/profile_pw2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                android:ems="15"
+                android:hint="비밀번호 확인"/>
+            <TextView
+                android:id="@+id/profile_equal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:visibility="gone"
+                android:textSize="10sp"
+                android:textColor="#888878"/>
+
+            <Button
+                android:id="@+id/profile_save"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="#9c27b0"
+                android:text="완료"
+                android:textColor="#ffffff"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
